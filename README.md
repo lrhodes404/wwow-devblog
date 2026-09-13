@@ -1,39 +1,31 @@
-# Chirpy Starter
+# Westworld of Warcraft — Dev Blog
 
-[![Gem Version](https://img.shields.io/gem/v/jekyll-theme-chirpy)][gem]&nbsp;
-[![GitHub license](https://img.shields.io/github/license/cotes2020/chirpy-starter.svg?color=blue)][mit]
+Source for the development blog at
+**[lrhodes404.github.io/wwow-devblog](https://lrhodes404.github.io/wwow-devblog)**.
 
-A minimal, ready-to-use template for creating a blog with the [**Chirpy**][chirpy] Jekyll theme. Get up and running in minutes with all critical files pre-configured.
+Built with [Jekyll](https://jekyllrb.com/) and the
+[Chirpy](https://github.com/cotes2020/jekyll-theme-chirpy) theme. GitHub Actions builds and
+deploys the site on every push to `main` — there is nothing to build locally.
 
-## Why This Starter Exists
+## Writing a post
 
-When installing Chirpy through [RubyGems.org][gem], Jekyll can only read a subset of theme files (`_data`, `_layouts`, `_includes`, `_sass`, `assets`) and limited `_config.yml` options from the gem. As a result, users cannot enjoy the full out-of-the-box experience that Chirpy offers.
+Add a file to `_posts/` named `YYYY-MM-DD-slug.md`:
 
-To unlock all features, the following files must be present in your Jekyll site:
+```markdown
+---
+title: "Post title"
+date: 2026-09-13 10:00:00 -0400
+categories: [Origin]
+tags: [wow, bots, reverse-engineering]
+---
 
-```shell
-.
-├── _config.yml
-├── _plugins
-├── _tabs
-└── index.html
+Body goes here.
 ```
 
-This starter bundles those files from the latest **Chirpy** release along with a [CD][CD] workflow, so you can start writing immediately.
+Commit and push. The build takes about a minute; progress is in the Actions tab.
 
-## Usage
-
-Check out the [theme's docs](https://github.com/cotes2020/jekyll-theme-chirpy/wiki).
-
-## Contributing
-
-This repository is automatically updated with new releases from the theme repository. If you encounter any issues or want to contribute to its improvement, please visit the [theme repository][chirpy] to provide feedback.
+A post dated in the future will not publish until that date passes.
 
 ## License
 
-This work is published under [MIT][mit] License.
-
-[gem]: https://rubygems.org/gems/jekyll-theme-chirpy
-[chirpy]: https://github.com/cotes2020/jekyll-theme-chirpy/
-[CD]: https://en.wikipedia.org/wiki/Continuous_deployment
-[mit]: https://github.com/cotes2020/chirpy-starter/blob/master/LICENSE
+Content © Lamar Rhodes. The Chirpy theme is MIT licensed; see [LICENSE](LICENSE).
