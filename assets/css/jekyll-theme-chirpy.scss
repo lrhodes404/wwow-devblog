@@ -1,0 +1,358 @@
+---
+---
+
+@use 'main';
+
+/* =============================================================
+   Westworld of Warcraft — a 1.12-flavoured palette.
+
+   Parchment page, dark brown text, gold rules, deep red buttons.
+   Everything here is a variable override on top of Chirpy, plus a
+   small number of targeted rules for the elements the theme does
+   not expose as variables.
+   ============================================================= */
+
+/* ---------- LIGHT: parchment ---------- */
+
+:root[data-bs-theme='light'],
+:root:not([data-bs-theme]) {
+  /* surfaces */
+  --main-bg: #f2e5c8;
+  --card-bg: #f9f0da;
+  --card-header-bg: #ecdcb6;
+  --card-hover-bg: #f6ead1;
+  --card-shadow: rgb(90 70 40 / 18%) 0 2px 6px 0, rgb(90 70 40 / 10%) 0 0 0 1px;
+  --main-border-color: #d8c69b;
+  --mask-bg: #e3d3ab;
+  --shimmer-bg: linear-gradient(
+    90deg,
+    rgb(0 0 0 / 0%),
+    rgb(140 110 60 / 12%),
+    rgb(0 0 0 / 0%)
+  );
+
+  /* type */
+  --text-color: #3a2c17;
+  --text-muted-color: #6f5c39;
+  --text-muted-highlight-color: #4a3a1f;
+  --heading-color: #46291a;
+  --post-list-text-color: #4b3a20;
+  --label-color: #5c4a2a;
+  --blockquote-text-color: #5c4a2a;
+  --blockquote-border-color: #c09a3e;
+
+  /* links */
+  --link-color: #8c1c13;
+  --link-underline-color: #c09a3e;
+
+  /* sidebar: dark stone with gold */
+  --sidebar-bg: #1b1510;
+  --sidebar-border-color: #3b2d1c;
+  --sidebar-muted-color: #a38c64;
+  --sidebar-active-color: #ffd100;
+  --sidebar-hover-bg: #2b2116;
+  --sidebar-btn-bg: #2b2116;
+  --sidebar-btn-color: #d8c69b;
+  --site-title-color: #ffd100;
+  --site-subtitle-color: #b09769;
+  --avatar-border-color: #c09a3e;
+  --nav-cursor-color: #ffd100;
+
+  /* topbar */
+  --topbar-bg: rgb(242 229 200 / 92%);
+  --topbar-text-color: #46291a;
+  --search-border-color: #cdb885;
+  --search-icon-color: #8a7550;
+  --input-focus-border-color: #8c1c13;
+
+  /* buttons */
+  --button-bg: #f9f0da;
+  --btn-border-color: #c09a3e;
+  --btn-backtotop-color: #f4e8cc;
+  --btn-backtotop-border-color: #c09a3e;
+  --btn-box-shadow: rgb(90 70 40 / 25%) 0 2px 5px 0;
+  --btn-patinator-text-color: #4b3a20;
+  --btn-paginator-hover-color: #e7d7b0;
+  --btn-share-color: #7a6440;
+  --btn-share-hover-color: #8c1c13;
+
+  /* code */
+  --highlight-bg-color: #efe1bd;
+  --highlight-lineno-color: #9c855c;
+  --inline-code-bg: #e7d8b2;
+  --code-color: #6b2118;
+  --code-header-text-color: #8a7550;
+  --code-header-muted-color: #cdb885;
+  --code-header-icon-color: #a38c64;
+  --clipboard-checked-color: #2f6b32;
+  --filepath-text-color: #46291a;
+  --language-border-color: #d8c69b;
+  --highlighter-rouge-color: #6b2118;
+
+  /* tables */
+  --tb-odd-bg: #f7edd6;
+  --tb-even-bg: #eee0ba;
+  --tb-border-color: #d8c69b;
+
+  /* tags, categories, toc */
+  --tag-border: #cdb885;
+  --tag-hover: #e7d7b0;
+  --tag-shadow: #d8c69b;
+  --search-tag-bg: #ecdcb6;
+  --categories-border: #d8c69b;
+  --categories-hover-bg: #e7d7b0;
+  --categories-icon-hover-color: #8c1c13;
+  --dash-color: #c9b489;
+  --toc-highlight: #8c1c13;
+  --toc-popup-border-color: #d8c69b;
+  --timeline-color: #cdb885;
+  --timeline-node-bg: #a38c64;
+  --timeline-year-dot-color: #8c1c13;
+
+  /* prompts: tinted parchment, not candy */
+  --prompt-text-color: #3a2c17;
+  --prompt-tip-bg: #e4ecd4;
+  --prompt-tip-icon-color: #4a7b37;
+  --prompt-info-bg: #e2e6ec;
+  --prompt-info-icon-color: #3c6491;
+  --prompt-warning-bg: #f3e6c4;
+  --prompt-warning-icon-color: #b1811f;
+  --prompt-danger-bg: #f2ded8;
+  --prompt-danger-icon-color: #8c1c13;
+
+  /* misc */
+  --checkbox-color: #b6a271;
+  --checkbox-checked-color: #8c1c13;
+  --img-bg: radial-gradient(circle, #f6ead1 0%, #e9dab4 100%);
+  --kbd-wrap-color: #9c855c;
+  --kbd-text-color: #3a2c17;
+  --kbd-bg-color: #f9f0da;
+  --footnote-target-bg: #efe0b6;
+}
+
+/* ---------- DARK: stone and gold ---------- */
+
+@mixin wow-dark {
+  --main-bg: #17120c;
+  --card-bg: #1f1810;
+  --card-header-bg: #272017;
+  --card-hover-bg: #2b2218;
+  --card-shadow: rgb(0 0 0 / 60%) 0 2px 8px 0, rgb(201 154 62 / 12%) 0 0 0 1px;
+  --main-border-color: #33281b;
+  --mask-bg: #241c13;
+
+  --text-color: #d9cbae;
+  --text-muted-color: #9a8663;
+  --text-muted-highlight-color: #c0ad88;
+  --heading-color: #e8cf90;
+  --post-list-text-color: #c6b591;
+  --label-color: #a8946f;
+  --blockquote-text-color: #a8946f;
+  --blockquote-border-color: #8a6f2c;
+
+  --link-color: #e8b84b;
+  --link-underline-color: #8a6f2c;
+
+  --sidebar-bg: #100c08;
+  --sidebar-border-color: #2a2015;
+  --sidebar-muted-color: #8b7955;
+  --sidebar-active-color: #ffd100;
+  --sidebar-hover-bg: #1e1710;
+  --sidebar-btn-bg: #1e1710;
+  --sidebar-btn-color: #b7a381;
+  --site-title-color: #ffd100;
+  --site-subtitle-color: #9a8663;
+  --avatar-border-color: #8a6f2c;
+
+  --topbar-bg: rgb(23 18 12 / 92%);
+  --topbar-text-color: #d9cbae;
+  --search-border-color: #33281b;
+  --search-icon-color: #7d6c4c;
+  --input-focus-border-color: #c09a3e;
+
+  --button-bg: #1f1810;
+  --btn-border-color: #4a3a22;
+  --btn-backtotop-color: #d9cbae;
+  --btn-backtotop-border-color: #4a3a22;
+  --btn-patinator-text-color: #c6b591;
+  --btn-paginator-hover-color: #2b2218;
+  --btn-share-color: #9a8663;
+  --btn-share-hover-color: #e8cf90;
+
+  --highlight-bg-color: #14100a;
+  --highlight-lineno-color: #6d5c3f;
+  --inline-code-bg: #241c13;
+  --code-color: #d7a86b;
+  --code-header-text-color: #8b7955;
+  --code-header-muted-color: #3a2d1d;
+  --code-header-icon-color: #6d5c3f;
+  --filepath-text-color: #e8cf90;
+  --language-border-color: #33281b;
+  --highlighter-rouge-color: #d7a86b;
+
+  --tb-odd-bg: #1c150e;
+  --tb-even-bg: #221a11;
+  --tb-border-color: #33281b;
+
+  --tag-border: #4a3a22;
+  --tag-hover: #2f2517;
+  --tag-shadow: #120d08;
+  --search-tag-bg: #241c13;
+  --categories-border: #33281b;
+  --categories-hover-bg: #2b2218;
+  --categories-icon-hover-color: #e8cf90;
+  --dash-color: #4a3a22;
+  --toc-highlight: #e8cf90;
+  --toc-popup-border-color: #33281b;
+  --timeline-color: #33281b;
+  --timeline-node-bg: #6d5c3f;
+  --timeline-year-dot-color: #c09a3e;
+
+  --prompt-text-color: #d9cbae;
+  --prompt-tip-bg: #1b2617;
+  --prompt-tip-icon-color: #5d8f46;
+  --prompt-info-bg: #16202b;
+  --prompt-info-icon-color: #5b8cc0;
+  --prompt-warning-bg: #2a2210;
+  --prompt-warning-icon-color: #c99a2e;
+  --prompt-danger-bg: #2a1512;
+  --prompt-danger-icon-color: #c0392b;
+
+  --checkbox-color: #6d5c3f;
+  --checkbox-checked-color: #c09a3e;
+  --img-bg: radial-gradient(circle, #241c13 0%, #17120c 100%);
+  --kbd-wrap-color: #6d5c3f;
+  --kbd-text-color: #d9cbae;
+  --kbd-bg-color: #1f1810;
+  --footnote-target-bg: #2a2210;
+}
+
+:root[data-bs-theme='dark'] {
+  @include wow-dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-bs-theme]) {
+    @include wow-dark;
+  }
+}
+
+/* =============================================================
+   Structural touches the variables do not cover
+   ============================================================= */
+
+/* Parchment grain: a very faint warm vignette, no texture image. */
+:root[data-bs-theme='light'] #main-wrapper,
+:root:not([data-bs-theme]) #main-wrapper {
+  background-image: radial-gradient(
+    ellipse at 50% 0%,
+    rgb(255 250 235 / 70%) 0%,
+    rgb(255 250 235 / 0%) 60%
+  );
+}
+
+/* Headings: gold rule under h2, the way panel headers are trimmed. */
+.content h2 {
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--blockquote-border-color);
+}
+
+.content h1,
+.content h2,
+.content h3,
+.content h4 {
+  font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua',
+    serif;
+  letter-spacing: 0.01em;
+}
+
+/* Post body in a serif, which is what parchment wants. */
+.content {
+  font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua',
+    serif;
+}
+
+/* Site title: small caps, gold, like a frame label. */
+#sidebar .site-title a {
+  font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 60%);
+}
+
+/* Red buttons with gold trim: tags, pagination, back-to-top. */
+.post-tag {
+  background: linear-gradient(180deg, #a32a1f 0%, #7d160f 100%);
+  border: 1px solid var(--btn-border-color);
+  color: #f6e8c8 !important;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 45%);
+}
+
+.post-tag:hover {
+  background: linear-gradient(180deg, #b8362a 0%, #8f1d14 100%);
+  border-color: #ffd100;
+  color: #fff5dc !important;
+  transition: all 0.2s ease-in-out;
+}
+
+#post-list .card-wrapper:hover .card {
+  border-color: var(--blockquote-border-color);
+}
+
+.pagination .page-item .page-link {
+  border: 1px solid var(--btn-border-color);
+}
+
+.pagination .page-item.active .page-link {
+  background: linear-gradient(180deg, #a32a1f 0%, #7d160f 100%);
+  border-color: var(--btn-border-color);
+  color: #f6e8c8;
+}
+
+#back-to-top {
+  border: 1px solid var(--btn-border-color);
+}
+
+#back-to-top:hover {
+  background: linear-gradient(180deg, #a32a1f 0%, #7d160f 100%);
+  border-color: #ffd100;
+  color: #f6e8c8;
+}
+
+/* Blockquotes read as an inset scroll. */
+.content blockquote {
+  background: var(--card-bg);
+  border-radius: 0 3px 3px 0;
+  padding: 0.6rem 1rem;
+}
+
+/* Tables: gold header row, the way the tooltip tables look. */
+.content table thead {
+  background: linear-gradient(180deg, #3a2d1c 0%, #241c13 100%);
+  color: #ffd100;
+}
+
+.content table thead th {
+  border-bottom: 2px solid var(--blockquote-border-color) !important;
+  color: #ffd100;
+}
+
+/* Inline code: raised parchment chip. */
+.content code:not([class*='language-']) {
+  border: 1px solid var(--language-border-color);
+  border-radius: 3px;
+  padding: 0.1rem 0.3rem;
+}
+
+/* Horizontal rules become a gold divider. */
+.content hr {
+  border: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgb(192 154 62 / 0%),
+    rgb(192 154 62 / 90%),
+    rgb(192 154 62 / 0%)
+  );
+  opacity: 1;
+}
