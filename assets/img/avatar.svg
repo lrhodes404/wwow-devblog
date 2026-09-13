@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="Westworld of Warcraft">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f2933"/>
+      <stop offset="1" stop-color="#0b0f14"/>
+    </linearGradient>
+  </defs>
+  <circle cx="80" cy="80" r="80" fill="url(#g)"/>
+  <!-- concentric rings: the park -->
+  <circle cx="80" cy="80" r="58" fill="none" stroke="#2f3a45" stroke-width="1.5"/>
+  <circle cx="80" cy="80" r="44" fill="none" stroke="#3a4753" stroke-width="1.5"/>
+  <circle cx="80" cy="80" r="30" fill="none" stroke="#475664" stroke-width="1.5"/>
+  <!-- waypoints on a path -->
+  <g fill="#c9a227">
+    <circle cx="80" cy="22" r="4"/>
+    <circle cx="121" cy="80" r="4"/>
+    <circle cx="80" cy="138" r="4"/>
+    <circle cx="39" cy="80" r="4"/>
+  </g>
+  <path d="M80 22 A58 58 0 0 1 121 80 A58 58 0 0 1 80 138" fill="none" stroke="#c9a227" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+  <circle cx="80" cy="80" r="9" fill="#c9a227"/>
+  <circle cx="80" cy="80" r="4" fill="#0b0f14"/>
+</svg>
