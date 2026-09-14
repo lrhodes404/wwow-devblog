@@ -1,6 +1,7 @@
 ---
 title: "Westworld of Warcraft"
 date: 2026-09-05 09:00:00 -0400
+series: buildlog
 categories: [Origin]
 tags: [wow, bots, origin]
 pin: true
@@ -123,3 +124,5 @@ this blog is about.
 > one to gain an advantage over, because there is no one else on the server. More on the scope and
 > the credits on the [about page]({{ site.baseurl }}/about/).
 {: .prompt-info }
+
+{% include series-nav.html %}
