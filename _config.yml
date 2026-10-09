@@ -227,7 +227,9 @@ exclude:
   - "package*.json"
 
 jekyll-archives:
-  enabled: [categories, tags]
+  # Off: the Tags/Categories/Archives tabs were removed for the chapter index, so per-tag and
+  # per-category pages would only link back to index pages that no longer exist.
+  enabled: []
   layouts:
     category: category
     tag: tag
