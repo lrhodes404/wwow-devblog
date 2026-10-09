@@ -4,6 +4,7 @@ description: "Building the coordination a group pull actually needs — raid mar
 date: 2026-09-15 09:00:00 -0400
 series: buildlog
 chapter: 10
+image: /assets/img/previews/chapter-10.png
 categories: [History]
 tags: [dungeoneering, group-ai, pathfinding, raid-markers]
 ---
@@ -16,8 +17,7 @@ it.
 That failure didn't get solved by grinding on it for years. Once the physics and scene-data work
 from the last several posts gave the navmesh something honest to describe, the coordination side of
 the dungeon problem turned out to be tractable in a few weeks. Whether the whole thing actually
-clears end to end yet is a separate question, and I want to answer it honestly rather than let the
-coordination win read as more than it is.
+clears end to end yet is a separate question.
 
 ## The long gap
 
@@ -47,7 +47,7 @@ reading party stats and marker assignments before deciding what to attack. That 
 it's the difference between five bots independently deciding what to attack and five bots agreeing
 on a target because someone put a skull on it.
 
-The second piece was threat-gated engagement. Plainly: a bot doesn't walk up and swing at whatever's
+The second piece was threat-gated engagement: a bot doesn't walk up and swing at whatever's
 nearby. It waits until the tank has actually established threat on a target before committing to
 it.
 
@@ -86,10 +86,9 @@ bakeLegalPullRegions(navmesh, room):
 
 Alongside the baking step is something I've been calling a pull-spot oracle — a coordinator can
 query it for a specific, navmesh-verified spot to send the puller to, instead of eyeballing a room's
-centroid and hoping. One thing I want to flag rather than overclaim: the code orders visits to
+centroid and hoping. The code orders visits to
 multiple pull spots and objectives, but there's no formal traveling-salesman implementation in
-here. It's ordered visitation, not a routing algorithm with a name, and I'm not going to call it
-something fancier just because "TSP" is the word that comes to mind when you see a list of stops.
+here. It's ordered visitation, not a routing algorithm with a name, even if "TSP" is the word that comes to mind when you see a list of stops.
 
 None of this landed as one clean piece and stayed put. A dead tank was forcing every follower to
 walk all the way to its corpse before the group could re-form — fine for a single character, a bad
@@ -105,13 +104,11 @@ _The same Earthborer fight from the "Inheritance" post, one frame later — this
 no threat-gating and no verified pull spot looked like from the inside. Nobody agreed on a target,
 nobody built threat first, and the healer found out the hard way._
 
-I want to be precise here instead of letting the coordination work read as a bigger win than it
-is: RFC has not been cleared end to end yet. What exists now is the machinery a clean clear would
+RFC has not been cleared end to end yet. What exists now is the machinery a clean clear would
 actually need — bots that agree on a target, a tank that reliably holds threat before anyone else
 commits, and pulls planned from verified, navmesh-backed spots instead of guesses. Each of those
 pieces works on its own and has been tested on its own. Stringing all of it together into one full
 run of the instance, start to finish, without a human stepping in, hasn't happened yet.
 
-That's a meaningfully different place than three years of "stuck under an overhang," and I don't
-want to undersell it. But it's not the same as having cleared the dungeon, and I'd rather say that plainly now than have a future post quietly
+That's a meaningfully different place than three years of "stuck under an overhang." But it's not the same as having cleared the dungeon, and I'd rather say that plainly now than have a future post quietly
 correct it.

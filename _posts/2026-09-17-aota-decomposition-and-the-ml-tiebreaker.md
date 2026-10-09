@@ -4,6 +4,7 @@ description: "How a goal becomes a sequence of steps, and how machine learning i
 date: 2026-09-17 09:00:00 -0400
 series: buildlog
 chapter: 12
+image: /assets/img/previews/chapter-12.png
 categories: [History]
 tags: [aota, decision-engine, machine-learning, architecture]
 mermaid: true

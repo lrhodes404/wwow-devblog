@@ -4,6 +4,7 @@ description: "Cloning Drew Kestell's BloogBot, and the one-process, one-characte
 date: 2026-09-06 09:00:00 -0400
 series: buildlog
 chapter: 2
+image: /assets/img/previews/chapter-02.png
 categories: [History]
 tags: [bloogbot, architecture, injection, memory]
 mermaid: true

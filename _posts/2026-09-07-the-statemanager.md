@@ -4,6 +4,7 @@ description: "Coordinating five bots instead of one, and the first sign that the
 date: 2026-09-07 09:00:00 -0400
 series: buildlog
 chapter: 3
+image: /assets/img/previews/chapter-03.png
 categories: [History]
 tags: [architecture, protobuf, ipc, coordination]
 mermaid: true
@@ -134,7 +135,7 @@ according to whatever was guiding them, they should not have been able to reach.
 
 The obvious suspect was navmesh generation, and it held up under a little digging. The server's
 navmesh had never needed to be exact, because the only things that had ever used it were
-server-controlled — creatures the game simply places wherever the server says, without needing them
+server-controlled — creatures the game places wherever the server says, without needing them
 to actually obey collision. My bots were not that. They were driving a real client through real
 geometry, and a mesh that was close enough for a mob that doesn't need to fit through a doorway is
 not close enough for one that does.

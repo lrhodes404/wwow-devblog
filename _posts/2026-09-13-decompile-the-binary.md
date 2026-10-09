@@ -4,6 +4,7 @@ description: "Reading WoW.exe's actual movement and collision code instead of gu
 date: 2026-09-13 09:00:00 -0400
 series: buildlog
 chapter: 7
+image: /assets/img/previews/chapter-07.png
 categories: [History]
 tags: [reverse-engineering, physics, collision, agents]
 mermaid: true

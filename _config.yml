@@ -100,7 +100,7 @@ avatar: /assets/img/avatar.svg
 
 # The URL of the site-wide social preview image used in SEO `og:image` meta tag.
 # It can be overridden by a customized `page.image` in front matter.
-social_preview_image: # string, local or CORS resources
+social_preview_image: /assets/img/previews/default.png # string, local or CORS resources
 
 # boolean type, the global switch for TOC in posts.
 toc: true
@@ -117,6 +117,8 @@ actions:
 
 comments:
   # Global switch for the post-comment system. Keeping it empty means disabled.
+  # Set to giscus once the giscus GitHub App is installed on lrhodes404/wwow-devblog
+  # (https://github.com/apps/giscus); until then the widget would show an error on every post.
   provider: # [disqus | utterances | giscus]
   # The provider options are as follows:
   disqus:
@@ -127,10 +129,10 @@ comments:
     issue_term: # < url | pathname | title | ...>
   # Giscus options › https://giscus.app
   giscus:
-    repo: # <gh-username>/<repo>
-    repo_id:
-    category:
-    category_id:
+    repo: lrhodes404/wwow-devblog
+    repo_id: R_kgDOUZiMlg
+    category: Announcements
+    category_id: DIC_kwDOUZiMls4DHYbZ
     mapping: # optional, default to 'pathname'
     strict: # optional, default to '0'
     input_position: # optional, default to 'bottom'

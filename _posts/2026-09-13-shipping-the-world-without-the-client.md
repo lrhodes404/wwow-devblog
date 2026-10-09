@@ -4,9 +4,9 @@ description: "Shipping the world's geometry to a client that never renders it, a
 date: 2026-09-13 21:00:00 -0400
 series: buildlog
 chapter: 8
+image: /assets/img/previews/chapter-08.png
 categories: [History]
 tags: [architecture, scene-data, mpq, scaling]
-mermaid: true
 ---
 
 
@@ -100,16 +100,10 @@ around the tile it's standing in, not the one to four tiles it actively uses. Th
 two is hysteresis. A tile has to leave the bigger boundary before it's actually let go, so ordinary
 movement near an edge doesn't turn into a request-evict-request-evict loop.
 
-```mermaid
-graph TD
-    subgraph "5x5 retained boundary"
-        subgraph "active tiles: 1 to 4, edge-aware"
-            B[bot position]
-        end
-    end
-```
+![Three 5x5 tile grids side by side: a bot in the middle of its tile with one active tile, a bot near an edge with two, and a bot near a corner with four, each grid outlined as the retained area](/assets/img/posts/scene-data-service/tile-window.svg)
+_The active set grows near an edge or a corner; a loaded tile stays until it leaves the 5x5._
 
-_Corrected 2026-10-08: an earlier version of this post described the active window as a fixed 3x3
+_Corrected in early October: an earlier version of this post described the active window as a fixed 3x3
 grid. The code never worked that way; the shared architecture standard said 3x3, and so did this
 post, until a component audit compared both against the source._
 

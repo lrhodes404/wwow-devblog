@@ -4,6 +4,7 @@ description: "Building a headless client so the fleet could scale past what laun
 date: 2026-09-08 09:00:00 -0400
 series: buildlog
 chapter: 4
+image: /assets/img/previews/chapter-04.png
 categories: [History]
 tags: [architecture, headless-client, ollama, bots]
 mermaid: true

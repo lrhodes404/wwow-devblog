@@ -4,6 +4,7 @@ description: "Moving CI, runtime services, and AI-agent routing off one overload
 date: 2026-09-19 09:00:00 -0400
 series: buildlog
 chapter: 14
+image: /assets/img/previews/chapter-14.png
 categories: [History]
 tags: [ci, jenkins, agents, infrastructure]
 ---
@@ -20,8 +21,8 @@ This post is about the three pieces of infrastructure that ended up underneath t
 once there was a fleet to be underneath: where tests actually run and get believed, where the game
 server itself lives, and how I decide which coding agent gets pointed at which task. They didn't
 land at the same time and I want to keep them separate, because collapsing them into "the
-infrastructure overhaul" would flatten three different stories into one, and the middle one is
-still half a plan.
+infrastructure overhaul" would flatten three different stories into one, and the middle one was
+still half a plan when I wrote this.
 
 ## Jenkins as the record
 
@@ -33,9 +34,8 @@ and it publishes a result file when it's done. That published result is the arti
 it doesn't exist, the change isn't tested, no matter how confident anyone — human or agent — is
 about it.
 
-The reasoning is blunt enough that I'll just state it: I was watching an agent iterate on a test
-failure, and at some point I noticed it wasn't really debugging anymore, it was negotiating with
-the test. Loosening an assertion here, catching an exception there, each change defensible on its
+I was watching an agent iterate on a test failure, and at some point I noticed it wasn't really
+debugging anymore, it was negotiating with the test. Loosening an assertion here, catching an exception there, each change defensible on its
 own, until the thing that was originally supposed to fail didn't fail, and also didn't really prove
 anything. Nobody told it to do that. It's just what happens when the thing running the test and the
 thing being graded by the test are the same process with the same goal. Move the grading somewhere
@@ -49,14 +49,17 @@ way — kick off the job, wait, read the result file, don't just trust its own `
 and move on. It's a small procedural thing that turned out to matter more than most of the actual
 code changes it verifies.
 
+_Since then: in early October every Jenkins job started being generated from the CI configuration,
+which is a git repo of its own, and every build now tests a clean clone of the committed branch, so
+nobody's uncommitted edits can make a test pass. "The Operator" has how it runs now._
+
 ## Getting the server off the dev machine
 
 A few weeks before the Jenkins change, I stopped running the game server stack on my own machine
-during live testing. This one is a cleaner before-and-after than the CI story, so it's worth
-describing plainly. Before: doing a live run meant the server emulator, the pathfinding service,
-and the scene-data service were all running locally, at the same time as VS Code, at the same time
-as whatever background client I was actually trying to test, all fighting over the same CPU and
-memory. It worked, mostly, but "mostly" is doing a lot of work in that sentence, and any time
+during live testing. This one is a cleaner before-and-after than the CI story. Before: doing a live
+run meant the server emulator, the pathfinding service, and the scene-data service were all running
+locally, at the same time as VS Code, at the same time as whatever background client I was actually
+trying to test, all fighting over the same CPU and memory. It worked, mostly, but "mostly" is doing a lot of work in that sentence, and any time
 something looked wrong I had to first rule out that my own machine was the reason.
 
 Now those services live on a separate production box — one machine that runs a TrueNAS-style
@@ -67,15 +70,16 @@ whichever layer I was thinking about that day. The dev machine doesn't run any o
 there's an explicit rule now that nobody starts the server stack locally. If you need a live run,
 you point at the production box.
 
-There's a piece of this that isn't done, and I want to be honest that it's a plan and not a thing
-that exists yet: the Jenkins build machine is also, at the moment, a single point of failure and a
-single point of contention. The plan is to clone it into an isolated copy specifically for testing,
-so a build can run on the original while a test workload runs against the clone without either one
-starving the other. The reason it hasn't happened is almost funny in how unglamorous it is — the
-current hardware doesn't have enough memory to run the original build machine, a full clone of it,
-and a multi-bot test workload all at the same time. So for now it's a plan sitting in a doc, not a
-thing running anywhere, and I'd rather say that outright than let "we're cloning the build machine"
-imply it's already cloned.
+There was a piece of this that wasn't done, a plan rather than a thing that existed: the Jenkins
+build machine was also, at the time, a single point of failure and a single point of contention.
+The plan was to clone it into an isolated copy specifically for testing, so a build could run on the
+original while a test workload ran against the clone without either one starving the other. The
+reason it hadn't happened was almost funny in how unglamorous it was — the hardware didn't have
+enough memory to run the original build machine, a full clone of it, and a multi-bot test workload
+all at the same time. So back then it was a plan sitting in a doc, not a thing running anywhere.
+
+_Since then: the game servers on that box run as Docker containers, with their builds and deploys
+going through CI. "The Operator" covers how CI shares the dev machine with me now._
 
 ## Auditing the agents themselves
 
@@ -116,4 +120,9 @@ helps and this post has examples of both. But it means it isn't the default, and
 be the default just because it sounds more capable on paper. It's kept available for the specific
 situations it actually helps, and a single agent working alone stays the baseline for everything
 else until something changes my mind with evidence, not architecture diagrams.
+
+_Since then: the setup has grown into an operator session that runs one director per repo, and a
+director usually hands each row's code to a worker. "The Operator" covers it, including why that
+doesn't contradict the finding above: the parallelism is across repos and across rows that don't
+share files, and nothing splits a single task._
 

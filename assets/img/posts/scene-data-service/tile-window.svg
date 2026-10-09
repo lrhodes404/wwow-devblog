@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="404" viewBox="0 0 800 404" font-family="Georgia, serif">
+  <title>Edge-aware active tiles inside a 5x5 retained window</title>
+  <rect width="800" height="404" fill="#1b1510"/>
+
+  <!-- Panel titles -->
+  <g fill="#d8c69b" font-size="19" text-anchor="middle">
+    <text x="138" y="38">Mid-tile</text>
+    <text x="400" y="38">Near an edge</text>
+    <text x="662" y="38">Near a corner</text>
+  </g>
+  <g fill="#ffd100" font-size="16" text-anchor="middle">
+    <text x="138" y="60">1 active tile</text>
+    <text x="400" y="60">2 active tiles</text>
+    <text x="662" y="60">4 active tiles</text>
+  </g>
+
+  <!-- Retained 5x5 area, lifted slightly off the background -->
+  <g fill="#3b2d1c" fill-opacity="0.35">
+    <rect x="33" y="84" width="210" height="210"/>
+    <rect x="295" y="84" width="210" height="210"/>
+    <rect x="557" y="84" width="210" height="210"/>
+  </g>
+
+  <!-- Active tiles (gold) -->
+  <g fill="#ffd100">
+    <rect x="117" y="168" width="42" height="42"/>
+    <rect x="379" y="168" width="42" height="42"/>
+    <rect x="421" y="168" width="42" height="42"/>
+    <rect x="641" y="168" width="42" height="42"/>
+    <rect x="683" y="168" width="42" height="42"/>
+    <rect x="641" y="126" width="42" height="42"/>
+    <rect x="683" y="126" width="42" height="42"/>
+  </g>
+
+  <!-- 100-yard edge band on the current tile (to scale: 100 / 533 of a tile) -->
+  <g fill="#c09a3e" fill-rule="evenodd">
+    <path d="M117 168h42v42h-42zM125 176h26v26h-26z"/>
+    <path d="M379 168h42v42h-42zM387 176h26v26h-26z"/>
+    <path d="M641 168h42v42h-42zM649 176h26v26h-26z"/>
+  </g>
+  <g fill="none" stroke="#3b2d1c" stroke-width="1" stroke-dasharray="3 2">
+    <rect x="125" y="176" width="26" height="26"/>
+    <rect x="387" y="176" width="26" height="26"/>
+    <rect x="649" y="176" width="26" height="26"/>
+  </g>
+
+  <!-- Tile grid; lines run past the outline to show the map continues -->
+  <g stroke="#3b2d1c" stroke-width="1.5">
+    <path d="M33 70v238M75 70v238M117 70v238M159 70v238M201 70v238M243 70v238
+             M19 84h238M19 126h238M19 168h238M19 210h238M19 252h238M19 294h238"/>
+    <path d="M295 70v238M337 70v238M379 70v238M421 70v238M463 70v238M505 70v238
+             M281 84h238M281 126h238M281 168h238M281 210h238M281 252h238M281 294h238"/>
+    <path d="M557 70v238M599 70v238M641 70v238M683 70v238M725 70v238M767 70v238
+             M543 84h238M543 126h238M543 168h238M543 210h238M543 252h238M543 294h238"/>
+  </g>
+
+  <!-- Retained 5x5 boundary -->
+  <g fill="none" stroke="#c09a3e" stroke-width="2.5">
+    <rect x="33" y="84" width="210" height="210"/>
+    <rect x="295" y="84" width="210" height="210"/>
+    <rect x="557" y="84" width="210" height="210"/>
+  </g>
+
+  <!-- The bot -->
+  <g fill="#1b1510" stroke="#d8c69b" stroke-width="1.5">
+    <circle cx="138" cy="189" r="3.75"/>
+    <circle cx="415.75" cy="189" r="3.75"/>
+    <circle cx="677.75" cy="173.25" r="3.75"/>
+  </g>
+
+  <!-- Key -->
+  <g fill="#d8c69b" font-size="16" text-anchor="middle">
+    <text x="400" y="340">Each square is one 533-yard tile. <tspan fill="#ffd100">Gold</tspan> tiles are the ones the bot requests.</text>
+    <text x="400" y="363"><tspan fill="#c09a3e">Shaded rim</tspan>: within 100 yards of an edge, the tile across it is added.</text>
+    <text x="400" y="386"><tspan fill="#c09a3e">Outline</tspan>: a loaded tile is kept until it falls outside the 5x5 around the bot's tile.</text>
+  </g>
+</svg>

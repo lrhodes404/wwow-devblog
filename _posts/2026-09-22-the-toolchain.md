@@ -4,6 +4,7 @@ description: "The tools that actually touch the code day to day: a symbol graph,
 date: 2026-09-22 09:00:00 -0400
 series: buildlog
 chapter: 16
+image: /assets/img/previews/chapter-16.png
 categories: [History]
 tags: [tooling, mcp, agents, codegraph, roslyn, ghidra]
 mermaid: true

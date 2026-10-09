@@ -4,6 +4,7 @@ description: "Two different approaches to collision and movement, tried one afte
 date: 2026-09-10 09:00:00 -0400
 series: buildlog
 chapter: 5
+image: /assets/img/previews/chapter-05.png
 categories: [History]
 tags: [physics, collision, navmesh, vmap]
 ---
@@ -31,7 +32,7 @@ VMaNGOS already parses this data — VMAP for static building and terrain-mesh c
 outdoor heightmaps — for its own line-of-sight and spell-range checks. That code already existed,
 was already tested, and answered exactly the question a background bot needed: given an X and Y
 and a starting Z, is there solid geometry below this point, and where. Wiring a bot's height query
-into that instead of the navmesh looked, at first, like it would simply make the overhang problem
+into that instead of the navmesh looked, at first, like it would make the overhang problem
 go away, since VMAP has to know about ceilings or the server's own sightline checks would be wrong
 too.
 

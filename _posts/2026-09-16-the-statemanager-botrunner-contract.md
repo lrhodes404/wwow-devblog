@@ -4,6 +4,7 @@ description: "Where the line between orchestration and execution actually sits, 
 date: 2026-09-16 09:00:00 -0400
 series: buildlog
 chapter: 11
+image: /assets/img/previews/chapter-11.png
 categories: [History]
 tags: [architecture, statemanager, botrunner, protobuf]
 mermaid: true
@@ -35,7 +36,7 @@ to hand down from outside.
 
 ## What the line actually says
 
-Here's the contract as it stands, stated plainly rather than as a diff of message types. The
+Here's the contract as it stands, in prose rather than as a diff of message types. The
 StateManager can select an Activity, start it, replace it, cancel it, and observe it. An Activity
 is a multi-minute, end-state-shaped goal — "run Ragefire Chasm," not "swing your weapon now." That's
 the entire vocabulary the StateManager is allowed to speak downward. It is explicitly forbidden from

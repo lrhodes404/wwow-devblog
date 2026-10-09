@@ -4,6 +4,7 @@ description: "Commit velocity went up two orders of magnitude. The physics wall 
 date: 2026-09-12 09:00:00 -0400
 series: buildlog
 chapter: 6
+image: /assets/img/previews/chapter-06.png
 categories: [History]
 tags: [agents, workflow, documentation, testing]
 mermaid: true

@@ -4,6 +4,7 @@ description: "Redrawing sixty flat Jenkins job names into a map: which games nee
 date: 2026-09-21 09:00:00 -0400
 series: buildlog
 chapter: 15
+image: /assets/img/previews/chapter-15.png
 categories: [History]
 tags: [ci, jenkins, pipelines, architecture]
 mermaid: true
@@ -41,10 +42,10 @@ flowchart LR
     end
 ```
 
-Right now that puts Ultima Online, Warhammer Online, Final Fantasy XI, WWoW, EverQuest, EverQuest
+At the time, that put Ultima Online, Warhammer Online, Final Fantasy XI, WWoW, EverQuest, EverQuest
 II, Ragnarok Online, Star Wars Galaxies, and Global Agenda all on the left — each with its own
 `<game>-pathfinding` and `<game>-scenedata` pair running the full build/unit/integration/deploy
-lane sequence. Diablo II and Phantasy Star Online sit on the right, with no such pair at all. A
+lane sequence. Diablo II and Phantasy Star Online sat on the right, with no such pair at all. A
 repo moves from the right column to the left the day its scale actually forces a background
 runner into existence — same template, new entries in the deployables list, nothing
 architecturally new gets invented for the occasion. And Pattern B isn't thinner testing, just a
@@ -130,10 +131,10 @@ flowchart TD
 
 Click the game, see its projects and how they connect. Click a project, see its lanes. Click a
 lane, see its steps. It's the same drill-down a purpose-built pipeline-visualization tool would
-give, built entirely out of nested folders instead of a separate plugin. WoWStateManager earns its
-own footnote here: it builds from a Windows base image, not the Linux image everything else in the
-fleet uses, so its build lane needs a Windows-capable agent while the rest of the tree runs on
-Linux without anyone having to think about it.
+give, built entirely out of nested folders instead of a separate plugin. WoWStateManager (now
+WoWOrchestrator) earns its own footnote here: it builds from a Windows base image, not the Linux
+image everything else in the fleet uses, so its build lane needs a Windows-capable agent while the
+rest of the tree runs on Linux without anyone having to think about it.
 
 Which lanes a project gets isn't a judgment call made folder by folder, either — it's a lookup on
 what the project *is*:
@@ -151,6 +152,10 @@ service — it never rebuilds anything itself. `reset-db` stays its own lane rat
 deploy, on purpose, because wiping data and shipping code are different amounts of damage if
 something goes wrong, and the existing rule around it — a reason has to be given, a backup happens
 before the wipe — carries over unchanged.
+
+_Since then: StorylineMcpServer and PromptHandlingService.Api were deleted at the end of September,
+and WoWStateManager was renamed WoWOrchestrator. Integration also stopped being a lane of its own: every live-client test now runs in each game's
+live lane._
 
 ## Builds that pull their own dependencies fresh
 
@@ -203,3 +208,7 @@ Some of this is running today and some of it is still the design sitting on pape
 deliberately not drawing that line in this post — a status snapshot goes stale within a week of
 writing it, and this chapter is about the shape of the thing, not a progress bar. The shape is
 what's going to outlast whichever specific job happens to be green or red on the day you read this.
+
+_Since then: in early October the dependency lists and the cross-job prebuild chain were cut. A job
+that needs native libraries now builds them itself, in its own workspace, from a clean clone of the
+committed branch, before the .NET build runs. "The Operator" has how the CI runs now._

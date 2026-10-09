@@ -4,6 +4,7 @@ description: "The same architecture, proven across four different games before i
 date: 2026-09-18 09:00:00 -0400
 series: buildlog
 chapter: 13
+image: /assets/img/previews/chapter-13.png
 categories: [History]
 tags: [pcecore, multi-game, architecture, reverse-engineering]
 mermaid: true
@@ -29,7 +30,7 @@ having to guess whether it would hold up outside WWoW.
 
 ## What PCECore actually is
 
-I should be precise about this, because the name invites the wrong picture. PCECore is not a
+The name invites the wrong picture. PCECore is not a
 library you add a package reference to and get a StateManager for free. It holds no game code and
 builds no binaries. Open its commit history and most of what you find is a documentation and RFC
 journal — cross-game reverse-engineering findings, decisions about where the MMO and session-based
@@ -38,7 +39,7 @@ a shared constitution the other repos agree to than something you'd import. Each
 implements the pattern itself, in its own language and its own wire format, and PCECore is where the
 argument about what the pattern should be gets settled and recorded.
 
-There's a detail in there I like enough to just state plainly: PCECore's own docs now call WWoW its
+There's a detail in there I like: PCECore's own docs now call WWoW its
 "reference implementation and best-practice source." The project that needed the standard written
 down for it ended up being the textbook example the standard points back to. Read that the wrong
 way and it sounds like circular reasoning — WWoW proves the standard, and the standard is defined by
@@ -74,7 +75,7 @@ as well as it expressed itself in a WoW dungeon, because "break the big thing in
 mid-sized things, and the mid-sized things into small ones you can actually implement and test" is
 true regardless of which game you're pointing it at.
 
-Put plainly, a new game repo doesn't start from a blank folder. It starts from a template, and the
+A new game repo doesn't start from a blank folder. It starts from a template, and the
 template is the same regardless of which game is about to get bolted onto it:
 
 ```mermaid
@@ -125,7 +126,7 @@ farming loop to prove it out the way D2Bot and the PSO project can.
 ![A Warhammer Online character approaching an open-world objective battle in Nordenwatch](/assets/img/posts/one-standard-many-games/warhammer-online-fg-bg-testing.png)
 _WARBot running against a live target, the same account somewhere further along, and a third run
 at an open-world objective fight. None of these is a milestone the way D2Bot's boss kill is —
-that's the honest point being made above, not a gap in the screenshots._
+that's the point being made above, not a gap in the screenshots._
 
 ![An FFXI character standing in Bastok Mines on the LandSandBoat "Nameless" server](/assets/img/posts/one-standard-many-games/ffxi-initial-character.png)
 ![Three FFXI party members standing together in South Gustaberg, each with a health bar in the party frame](/assets/img/posts/one-standard-many-games/ffxi-party-time.png)
@@ -145,7 +146,7 @@ of the reverse-engineering sprint the next section is about to argue no shared s
 
 ## Where it didn't transfer
 
-The honest part of this post is that "one universal architecture" is not what actually happened, and
+"One universal architecture" is not what actually happened, and
 the biggest counterexample is the foreground/background client split itself — the thing several of
 the last several posts were entirely about. That split exists because WWoW has to account for an MMO
 with thousands of potential concurrent bots, and running that many full game clients was never going
@@ -160,7 +161,7 @@ session-based/ARPG-style, and the standard says different things depending on wh
 an MMO-category game gets the full split, with a background runtime doing collision and pathing for
 however many bots are actually online, plus the services that feed it world geometry; a session-based
 game gets a single process per bot and none of that machinery. Pretending there was a single shape
-that covered both would have been the less honest version of this post, and it also would have meant
+that covered both would have misstated what happened, and it also would have meant
 D2Bot and the PSO project carrying around a PathfindingService and a SceneDataService that a review
 already concluded they don't need — infrastructure with no job, just because the standard said
 everyone gets one.

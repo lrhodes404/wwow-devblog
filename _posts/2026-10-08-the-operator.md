@@ -4,6 +4,7 @@ description: "One long-running session that runs a dozen other sessions, and the
 date: 2026-10-08 09:00:00 -0400
 series: buildlog
 chapter: 18
+image: /assets/img/previews/chapter-18.png
 categories: [History]
 tags: [agents, operator, ci, jenkins, workflow]
 mermaid: true
@@ -159,10 +160,15 @@ at the bottom layers than about how well they work.
 
 WWoW is still on layer 0. BotRunner's suite is green in Jenkins — 7,312 tests, none failing — but the
 layer needs every project green from a clean checkout, and the physics and pathfinding projects are
-failing on data rather than code. While chasing those, a director found that the game server's copy of
-the world had no map or collision tiles for Ragefire Chasm at all. The dungeon this project has been
-trying to finish since 2024 was missing from the server's own data. A full re-extract from the client
-and a full navmesh rebake are rows on the boards now, in that order.
+failing on data rather than code. While chasing those, a director reported that the game server's
+copy of the world had no terrain tiles for Ragefire Chasm at all, and a full re-extract from the
+client got queued on the strength of it. As it turns out, Ragefire is built entirely from interior
+models, so no extraction ever produces terrain tiles for it; the server's data was fine all along.
+The re-extract was thrown out, the failing Ragefire tests went back to being diagnosed as a test or
+data-path problem, and the full navmesh rebake goes ahead on the data that was already deployed.
+
+_Corrected 2026-10-09: an earlier version of this section said Ragefire Chasm was missing from the
+server's data. It wasn't, as above._
 
 The flagship repo is the last one off the ground floor, which is the layer rule doing exactly what I
 asked it to.
