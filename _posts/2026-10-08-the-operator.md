@@ -11,8 +11,8 @@ mermaid: true
 
 There is a terminal on my desktop that has been running the same Claude Code session since October 6.
 Every few minutes it wakes up, checks how much usage is left, looks in on twelve other sessions, pushes
-whatever they've finished, rewrites a status file, and goes back to sleep. As I write this it's on round
-196. It's called the operator, and it doesn't write code.
+whatever they've finished, rewrites a status file, and goes back to sleep. As I write this it's on
+round 196. It's called the operator, and it doesn't write code.
 
 At the end of "The Toolchain" I said I'd be surprised if the worker table looked the same the next time
 I wrote about it. It doesn't. That post described one coordinating session handing work to a few workers

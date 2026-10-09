@@ -22,19 +22,19 @@ inspection, that family of technique was not news to me — but seeing it laid o
 working codebase attached to every claim, was a different thing entirely. I cloned the repo that
 night.
 
-My first commit landed 2023-09-20: *"Basic questing implemented without item use working."* Not
-much of a start, and it did not need to be, because BloogBot already worked before I touched it. It
+My first commit landed in September 2023: *"Basic questing implemented without item use working."*
+Not much of a start, and it did not need to be, because BloogBot already worked before I touched it. It
 leveled a character, fought, looted, ran back to its corpse when it died. The most important
 decision I made in that first stretch was not writing anything — starting from someone else's
 working thing meant my first problem was a real one, not a solved one.
 
 The clone kept its history, which is a strange thing to sit with in retrospect. Drew's own commits
-are still in there — something like 35 to 46 of them, from 2021-06-07 through mid-2023, under his
+are still in there — something like 35 to 46 of them, from mid-2021 through mid-2023, under his
 own name. My "inheritance" was not a description I copied from a README. It is a git log with two
 authors in it, and for the first year the second author was doing almost nothing that the first
 author hadn't already made possible.
 
-Two weeks after that first commit, on 2023-10-04, I renamed the solution. The commit message says
+Two weeks after that first commit, I renamed the solution. The commit message says
 *"Refactored solution to better describe projects,"* which undersells it — the project stopped
 being called BloogBot and became **RaidLeaderBot**. That rename is the whole thesis of the next two
 years, stated before I had any idea how to deliver on it. I did not want a bot that farmed. I wanted

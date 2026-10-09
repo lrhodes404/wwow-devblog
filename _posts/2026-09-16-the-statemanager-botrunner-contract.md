@@ -80,9 +80,9 @@ place that already has the most information in front of it is the path of least 
 whether or not that place is the right owner for it.
 
 So it happened. More than once. The commit log has titles like "Remove StateManager progression
-objective path" and "enforce BotRunner activity execution boundary," landing 2026-08-28, which
-tells you the fix wasn't quiet — something had drifted far enough that it needed a named correction
-with a date attached. Two weeks before that there's a separate "stop-line correction" in the spec
+objective path" and "enforce BotRunner activity execution boundary," landing at the end of August,
+which tells you the fix wasn't quiet — something had drifted far enough that it needed a named
+correction of its own. Two weeks before that there's a separate "stop-line correction" in the spec
 itself, which is its own tell: the stop line, the exact point where the StateManager's authority
 ends, had moved somewhere it shouldn't have and had to be corrected back. I'm not going to pretend
 these were the last ones, either. As of the most recent pass through the spec, both corrections are

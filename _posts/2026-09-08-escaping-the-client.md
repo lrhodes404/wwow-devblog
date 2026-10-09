@@ -14,8 +14,8 @@ The idea came up in conversation with Jared, the way most of the good ones did: 
 populated by bots, each one simulating a character with its own personality, human enough that
 a real player logged in next to it couldn't tell whether anyone was at the keyboard. We liked it
 immediately and then, about thirty seconds later, ran into the part where it doesn't work.
-Populating a world means thousands of characters. You cannot launch 3,000 copies of a game from
-2006. Each one wants a window, a GPU context, audio, something like a gigabyte of memory, and the
+Populating a world means thousands of characters. You cannot launch 3,000 copies of a game
+from 2006. Each one wants a window, a GPU context, audio, something like a gigabyte of memory, and the
 math fails long before you get anywhere near the interesting problem.
 
 ![Two full raid groups of level-60 characters filling both raid frames, with Task Manager showing 64 GB of memory in use](/assets/img/posts/escaping-the-client/wow-background-scaling.png)
@@ -43,13 +43,13 @@ person — has a body cheap enough to run three thousand of.
 
 ## The other half of that commit
 
-The project log shows the shape of this coming together in real time. 2024-07-16: "Working
-headless client POC," a project I named WoWSlimClient. The next two days were spent making it
+The project log shows the shape of this coming together in real time. In mid-July 2024 the first
+headless client worked as a proof of concept, a project I named WoWSlimClient. The next two days were spent making it
 modular — clients, object management, and event notifications pulled apart into their own pieces
 before the thing had done anything useful yet, which in hindsight is just how I work.
 
-Then, on 2024-08-07, I committed "Refactored app to utilize BackgroundServices and moved BotRunner
-behind interfaces." If that date looks familiar, it's because the last post described the other
+Then, in early August, I committed "Refactored app to utilize BackgroundServices and moved BotRunner
+behind interfaces." If that line looks familiar, it's because the last post described the other
 half of the same day's work — the StateManager and BotRunner naming split happened here too. What
 I didn't dwell on there is what "behind interfaces" actually bought: the behavior engine, the part
 of a bot that decides what to do, no longer has any idea what it's driving. Above the interface,
@@ -65,7 +65,7 @@ flowchart TB
   FG -.->|"packet captures set the baseline"| BG
 ```
 
-Two days later, on 2024-08-09, the headless client was running as a BackgroundService, and
+Two days later the headless client was running as a BackgroundService, and
 WoWSharpClient shows up in the log — the name it still goes by. The foreground runtime stayed
 ground truth, because it's the real game and whatever it does is correct by definition. The
 background runtime was the one built for scale, and everything it did had to be checked against
@@ -75,15 +75,17 @@ reimplementation was actually right rather than just plausible.
 ![Two characters fishing side by side off the dock at Ratchet, one a manually-played foreground client and one a background bot mirroring it](/assets/img/posts/escaping-the-client/wow-fishing.png)
 _This is what checking the background runtime against the foreground one actually looked like in
 practice — the same small, repeatable action running on both, side by side, so any divergence
-between them had nowhere to hide._ Character creation followed
-almost a year later, on 2025-05-17 — the headless client could finally make its own characters
-instead of borrowing ones I'd made by hand. By 2025-06-02 the whole thing got rearranged into the
-Exports and Services layout still in use today, which is a less interesting sentence than the
-work it represents.
+between them had nowhere to hide._
+
+Character creation followed almost a year later — the headless client could finally make its own
+characters instead of borrowing ones I'd made by hand. A couple of weeks after that, the whole thing
+got rearranged into the Exports and Services layout still in use today, which is a less interesting
+sentence than the work it represents.
 
 ## Talking to it
 
-On 2024-08-16 the log says "Working Ollama integration with chat," which undersells what that
+A week after the headless client became a service, the log says "Working Ollama integration with
+chat," which undersells what that
 afternoon actually felt like. Chat is a simple subsystem as WoW protocol goes — an opcode, a
 message type, a string — so wiring it to a locally running Ollama instance wasn't much code. I
 piped incoming chat packets into the model and sent whatever came back out the other side as a

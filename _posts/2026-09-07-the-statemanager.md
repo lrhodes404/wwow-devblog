@@ -24,18 +24,18 @@ live somewhere none of the five characters do.
 
 ## A central hub
 
-The fix started small and stayed small for a while. Nine days after my first commit, on
-2023-09-29, the message is *"Big change to make bots communicate from central hub."* That is the
-actual birth of coordination in this project — not a design doc, not a diagram, just a commit
-message admitting that bots talking to each other was now the blocker. Progress after that came in
-the kind of increments that look unglamorous in a log and felt enormous at the time: *"Basic
-dungeon crawling implemented"* on 2023-10-10, *"Functional dungeon pathfinding implemented"* on
-2023-10-21. By November the hub had a name. 2023-11-08: *"Clients launching from ActivityManager and
-logging in."* Not the StateManager — that name did not exist yet. It was the ActivityManager, and
-for the better part of a year that is what I called the thing that told bots what to do.
+The fix started small and stayed small for a while. Nine days after my first commit, the message
+is *"Big change to make bots communicate from central hub."* That is the actual birth of
+coordination in this project — not a design doc, not a diagram, just a commit message admitting
+that bots talking to each other was now the blocker. Progress after that came in the kind of
+increments that look unglamorous in a log and felt enormous at the time: basic dungeon crawling
+that October, then dungeon pathfinding that actually worked a couple of weeks later. By November
+the hub had a name, and clients were launching from it and logging in. Not the StateManager — that
+name did not exist yet. It was the ActivityManager, and for the better part of a year that is what
+I called the thing that told bots what to do.
 
 It was not stable. A week after clients were launching cleanly, the log reads *"Working
-dungeoneering... again"* on 2023-11-15 — and that "again" is doing a lot of work. Something that had
+dungeoneering... again"* — and that "again" is doing a lot of work. Something that had
 worked stopped working, badly enough that getting it back was its own commit. I don't have a clean
 memory of what regressed; what I have is the git record admitting it happened, which is more than I
 had before I went looking.
@@ -44,7 +44,7 @@ had before I went looking.
 
 The ActivityManager sat there, mostly working, for months. What actually rebuilt it was not a
 decision I made — it was Jared, coming back to the project with a proof of concept for how the
-pieces should actually talk to each other. On 2024-06-23 his initial commit lands a C++
+pieces should actually talk to each other. In June 2024 his initial commit lands a C++
 ActivityManager, a generated protobuf runtime, and a file called `communication.proto` that was
 twenty lines long. Here it is in full, because it is short enough to just show:
 
@@ -70,12 +70,12 @@ message taxonomy on day one, and guessing it into a wire format is worse than le
 same file has since grown into something considerably larger, across several files, and I will get
 to that in a later post. In June of 2024 it was twenty lines, and that was enough to build on.
 
-Two days after the proto landed, on 2024-06-25, the commit message says *"Refactor to separate
-roles into different apps."* That is the sentence where the StateManager is actually born as its
-own named thing, separate from whatever runs inside the bot itself — nine months after the
-ActivityManager concept first showed up in the log, and under a different name from the one it
-started with. 2024-06-27 confirms the split builds: *"Working build after refactor."* By
-2024-07-07, *"Working client launching"* again, this time from the new shape.
+Two days after the proto landed, the commit message says *"Refactor to separate roles into
+different apps."* That is the sentence where the StateManager is actually born as its own named
+thing, separate from whatever runs inside the bot itself — nine months after the ActivityManager
+concept first showed up in the log, and under a different name from the one it started with. Two
+days after that the split built, and by early July clients were launching again, this time from the
+new shape.
 
 ## What the StateManager actually does
 
@@ -117,13 +117,13 @@ Openness/Conscientiousness/Extraversion/Agreeableness/Neuroticism sliders per bo
 earlier and much smaller-scale version of the "give every character a distinct personality" idea
 than anything in this post's architecture — it existed as a config field years before it was
 anything the BotRunner actually had to reckon with._
-2024-08-07 is the day both formal terms land in the same commit message: *"Refactored app to
-utilize BackgroundServices and moved BotRunner behind interfaces."* Same day, a second commit:
-*"ActivityManagers launching from StateManager."* That is the StateManager/BotRunner split as it
-exists from here forward — the StateManager owns the roster and the tasking, the BotRunner owns
-whatever a specific bot does with a task once it has one. Two days later, 2024-08-09, *"Refactored
-to launch headless client as BackgroundService"* — the first sign that not every bot would need a
-full WoW.exe window forever. That thread belongs to the next post. I'm not going to pull on it here.
+
+Early August is when both formal terms land in the same commit message: *"Refactored app to
+utilize BackgroundServices and moved BotRunner behind interfaces."* The same day, the StateManager
+started launching the ActivityManagers itself. That is the StateManager/BotRunner split as it exists
+from here forward — the StateManager owns the roster and the tasking, the BotRunner owns whatever a
+specific bot does with a task once it has one. Two days later the headless client was launching as
+a background service — the first sign that not every bot would need a full WoW.exe window forever. That thread belongs to the next post. I'm not going to pull on it here.
 
 ## Ragefire Chasm, again
 

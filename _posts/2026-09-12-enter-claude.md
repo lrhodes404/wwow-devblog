@@ -42,7 +42,7 @@ Commit volume is the cleanest way to show what changed, so here it is, plainly:
 | Mar 2026 | 833 |
 | Jul 2026 | 2,203 |
 
-The 2026-02-08 commit reads "Claude overhaul WIP", and the ones around it have the texture of a
+One commit that February reads "Claude overhaul WIP", and the ones around it have the texture of a
 codebase being taken apart faster than it could be put back together: "The mother of all merge
 commits", "Completely merged.", "Mess of a WIP." Behind those, a wave of `codex/*` and `agent/*`
 branches showed up doing things I'd wanted for years and never scheduled — an evaluation of

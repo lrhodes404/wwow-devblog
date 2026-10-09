@@ -28,13 +28,13 @@ symptoms. The binary *is* the ground truth. It had been sitting on my disk the w
 
 ## Two years, then forty-eight hours
 
-| Date | Commit |
-| --- | --- |
-| 2026-03-21 | Decompile WoW.exe physics, update constants to exact binary values |
-| 2026-03-22 | Decompile WoW.exe collision sweep: AABB 2-pass at 0x633840 |
-| 2026-03-22 | Decompile WoW.exe spatial collision grid and contact system |
-| 2026-03-22 | Decompile WoW.exe packet send pipeline and movement dispatch |
-| 2026-03-22 | Document complete MovementInfo wire format from WoW.exe decompilation |
+Over two days in late March, five pieces came out of the binary, one after another:
+
+- the physics, with every constant replaced by the exact value stored in the binary
+- the collision sweep: a two-pass AABB at `0x633840`
+- the spatial collision grid and the contact system
+- the packet send pipeline and movement dispatch
+- the complete `MovementInfo` wire format
 
 The negative result came first, and it was the one that mattered most: `WoW.exe` is **not** a PhysX-style three-pass swept-capsule character controller.
 
@@ -154,7 +154,7 @@ independent verification against the binary itself — every check up to that po
 my own notes about the binary, which is a weaker claim than it sounds like. Documentation drifts.
 A comment gets written down slightly wrong once, gets trusted, and then everything built on top of
 it inherits the mistake without anyone noticing, because nothing downstream is checking the binary
-again — it is checking the note about the binary. On 2026-07-24 I imported `WoW.exe` into a running
+again — it is checking the note about the binary. In late July I imported `WoW.exe` into a running
 Ghidra MCP project and went back through the FG/BG physics parity rows one at a time, checking each
 constant and each routine against the actual bytes and Ghidra's own decompilation, not against what
 I had written down about them in March.

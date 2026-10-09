@@ -33,8 +33,8 @@ many bots doing that at once was, and that's a data-serving problem, not a physi
 Long before there was anything you could call a service, there were parsers. Mid-2025, well before
 any of this needed to answer to more than one bot at a time, I was writing code that reached
 directly into the WoW MPQ archive format to pull out ADT terrain and VMAP collision data — a
-"Working ADT Terrain parser" landed 2025-06-17, a "'Working' VMAP polygon tester" followed a few
-weeks later on 2025-07-07, with assorted height, liquid, and line-of-sight passes scattered through
+working ADT terrain parser in June, a "working" VMAP polygon tester a few weeks later, with
+assorted height, liquid, and line-of-sight passes scattered through
 the middle of that year. This is the part of the project I can tell you the least about with any
 confidence. The commit log for that stretch is thin, the messages are short, and I honestly don't
 remember all the specifics of how the byte layout for ADT chunks or VMAP node trees got worked out.
@@ -50,12 +50,12 @@ copy of a rather large parser to get it.
 
 ## The service is born
 
-2026-03-29 is the commit that actually named the thing: "Add SceneDataService + SceneDataClient
-for on-demand collision data." A single process loads the VMAP and ADT data for a map once, keeps
-it warm, and answers requests from bots over TCP for scene grids around a given position. Under the
-hood it leans on a native Navigation library call to pull triangles back out of the map data rather
-than re-deriving them by hand for every request. Worth a one-line mention and no more: this commit
-is already from the era where an AI agent is a listed co-author on the change. Not the subject of
+The thing finally got a name at the end of March 2026: SceneDataService, with a SceneDataClient on
+the bot side, for collision data on demand. A single process loads the VMAP and ADT data for a map
+once, keeps it warm, and answers requests from bots over TCP for scene grids around a given
+position. Under the hood it leans on a native Navigation library call to pull triangles back out of
+the map data rather than re-deriving them by hand for every request. Worth a one-line mention and no
+more: that change is already from the era where an AI agent is a listed co-author on the change. Not the subject of
 this post — that story gets its own later — just a small fact about the timeline.
 
 Early April wired the new service into the StateManager, then immediately ran into the kind of
@@ -64,26 +64,22 @@ thread-safety issues, host-builder wiring that needed partial reverting and re-f
 confusion about per-map preload timing that logging had to be added just to see what was happening
 during startup.
 
-## April 7th, and the pivot to tiles
+## One day in April, and the pivot to tiles
 
-One day did most of the real work of turning this from "a service that answers position queries"
-into something that could actually scale. 2026-04-07 has four commits that all matter:
+One day in April did most of the real work of turning this from "a service that answers position
+queries" into something that could actually scale. Four changes landed together:
 
-- "Fix SceneDataService — ground-focused Z range + no mmap loading" — an explicit decision to stop
-  loading full mmap navmesh data just to answer a scene query. The service only needed enough
-  vertical range to know what's near the ground, not the whole column.
-- "Drop normals from tile wire format — vertices only, ~2x throughput" — the wire format had been
-  shipping normals nobody was using yet, and cutting them roughly doubled how much tile data could
-  move per second.
-- "GZip compress tile vertex data on wire — 1.5x more throughput" — compression on top of that, for
-  another one and a half times.
-- "Add SceneTileSocketServer: pre-loads .scenetile files, serves by tile key" and "Add tile-based
-  scene architecture (533y ADT tiles)" — the actual pivot. Instead of asking the service for "a
-  grid around this position" and making it figure out what that means fresh every time, bots ask
-  for specific tiles by a fixed key, matching WoW's own 533-yard ADT tile grid. The service
-  pre-loads `.scenetile` files and serves them straight from that index.
+- The service stopped loading full mmap navmesh data just to answer a scene query. It only needed
+  enough vertical range to know what's near the ground, not the whole column.
+- Normals came out of the tile wire format. It had been shipping normals nobody was using yet, and
+  sending vertices only roughly doubled how much tile data could move per second.
+- Tile vertex data got GZip-compressed on the wire, for another one and a half times on top of that.
+- The actual pivot: tiles. Instead of asking the service for "a grid around this position" and
+  making it figure out what that means fresh every time, bots ask for specific tiles by a fixed key,
+  matching WoW's own 533-yard ADT tile grid. The service pre-loads `.scenetile` files and serves them
+  straight from that index.
 
-That last pair is the change that made everything downstream simpler, because it turned a fuzzy
+That last one is the change that made everything downstream simpler, because it turned a fuzzy
 spatial query into a lookup.
 
 ## The edge-aware window and the 5x5 margin
@@ -121,10 +117,9 @@ It's a small idea and it isn't original to this project — hysteresis bands sho
 have a threshold and something noisy crossing it — but it's the single piece of this service that
 actually made the tile-based approach hold up under bots that don't stand still.
 
-Later tightening moved in the same direction: 2026-07-20's "Require SceneDataService for BG physics
-geometry" made the service load-bearing rather than optional for background bots, and "Reduce BG
-SceneData slice injection size" shrank how much tile data got pushed into a bot's working set at
-once, on the theory that a bot rarely needs to hold more than its immediate neighborhood no matter
+Later tightening moved in the same direction. In July the service became required for background
+physics geometry, load-bearing rather than optional, and a smaller slice size shrank how much tile
+data got pushed into a bot's working set at once, on the theory that a bot rarely needs to hold more than its immediate neighborhood no matter
 how the number looked on paper earlier.
 
 ## What this actually bought
