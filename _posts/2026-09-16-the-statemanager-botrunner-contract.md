@@ -89,20 +89,14 @@ these were the last ones, either. As of the most recent pass through the spec, b
 still marked current, not historical — meaning this boundary is still being actively renegotiated
 right now, not a design that got settled once in 2024 and left alone since.
 
-The shape of the leak was always the same. Something needed to happen next, the StateManager
-already had a view of the whole roster and a convenient place to put a decision, and the BotRunner
-side of the wire hadn't grown its own opinion about that decision yet. So the decision went into
-the StateManager, because that's where it was easy to write, not because that's where it belonged.
-Months later, once the BotRunner had matured enough to actually own that decision properly, someone
-had to notice the StateManager was still making it, and write the commit that took it back out.
-This is not a case where I got the design right, spent two years implementing it, and I'm writing
-the retrospective — it's a case where the design kept drifting toward the wrong shape for the same
-structural reason every time. Every correction so far has been subtractive: the fix was never "add
-a rule," it was "remove the thing that snuck up."
+Each time, the decision went into the StateManager before the BotRunner side had grown its own
+opinion about it, and months later, once the BotRunner could own it properly, someone had to notice
+the StateManager was still making it and write the commit that took it back out. Every correction
+so far has been subtractive: the fix was never "add a rule," it was "remove the thing that snuck
+up."
 
 The general shape underneath all of it: the component with the best view is not automatically the
-component that should decide. The StateManager can see the whole fleet, which makes it look like
-the obvious place to put any decision. But it's the wrong place for any decision that needs the
+component that should decide. The StateManager is the wrong place for any decision that needs the
 local, high-frequency state that only the runner sitting next to that one character actually has —
 where its feet are this tick, what's on top of its Task stack, whether the last Action landed. By
 the time that state has been serialized, shipped across a socket, and reasoned about somewhere

@@ -172,24 +172,16 @@ so a delegated task leaves evidence behind instead of a result with no history.
 _What the top box in that diagram actually looks like most of the time — an editor, an agent
 terminal, and whichever game client is being tested against, all open at once, bug and all._
 
-An earlier post — the one about deciding which coding agent gets which task — already covered the
-least flattering and most important finding from actually using this: a coordinator handing work
-to multiple workers on the same task measured over four times
-slower than one agent doing the whole thing alone, for the same quality at the end. That's not a
-reason this system doesn't exist. It's the reason it isn't the default — the five branches above get
-used when a task specifically calls for cheap bulk reading, an independent second opinion, or a
-separable piece of work, and the coordinator does everything else itself. The tree in the diagram is
-real, but most tasks never leave the top box.
+The finding from "One Overloaded Machine" still holds — a coordinator splitting one task across
+workers was over four times slower than one agent doing it alone — so the five branches above get
+used only when a task specifically calls for cheap bulk reading, an independent second opinion, or a
+separable piece of work. The tree in the diagram is real, but most tasks never leave the top box.
 
 ## What all four of these have in common
 
 None of them make the coordinating session smarter. What they do is keep it from spending its own
 limited attention re-deriving things a database, a compiler, a standing RE server, or a cheaper
-process could have answered instead. CodeGraph and the Roslyn tools protect against re-reading code
-that's already indexed. Ghidra staying up protects against re-running a multi-day investigation for
-a question that only needs one answer. The coordinator-and-workers system protects against spending
-the coordinator's own context on work that a cheaper or more independent process could have done
-just as well. Different tools, same job: keep the expensive thing — judgment, applied to this
+process could have answered instead. Different tools, same job: keep the expensive thing — judgment, applied to this
 specific codebase — as the scarce resource it actually is.
 
 None of this is finished, and I'd be surprised if the worker table above looks the same the next

@@ -18,12 +18,8 @@ hobbies and needed a way back in that didn't start with re-reading my own code f
 
 None of this started with Claude. By this point ChatGPT and Copilot were already just part of how I
 worked — pasting in a function to get a second opinion, letting autocomplete finish a boilerplate
-block, the ordinary way most developers were already using both tools. The PhysX-CCT model from the
-last post was built with that kind of help in the loop the whole time, and none of it changed the
-outcome: all three tools, at different points, took a run at the same capsule-and-collision code and
-came back with the same shape of answer, because none of them could see any further into the
-problem than I could. A plausible-looking fix is still just a fix somebody has to verify by hand, no
-matter which tool typed it.
+block, the ordinary way most developers were already using both tools — and the PhysX-CCT model
+from the last post was built with that kind of help in the loop the whole time.
 
 Jared messaged me to say he'd tried the new Claude Code and that it would get me past my next
 hurdle. I started using it, added Codex not long after, and knew within days that something about

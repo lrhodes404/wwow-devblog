@@ -110,10 +110,8 @@ lean on, and the difference isn't subtle. Today D2Bot has one full quest working
 1's "Den of Evil" — backed by more than 12,000 passing tests. None of that speed came from Diablo II
 being an easier game to reverse-engineer than WoW; if anything, a randomly generated dungeon layout
 per session is its own kind of hard. It came from not having to reinvent the shape of the solution
-before starting on the game-specific part of it. The StateManager didn't need to be designed again.
-The Activity/Objective/Task/Action layers didn't need to be argued about from scratch. All of that
-was settled, and settled meant D2Bot could spend its first three weeks on Diablo II's actual memory
-layout and packet structure instead of on architecture.
+before starting on the game-specific part of it, so D2Bot could spend its first three weeks on
+Diablo II's actual memory layout and packet structure instead of on architecture.
 
 WAR and FFXI went through the same March 23 rewrite, and I'm not going to overstate where either one
 sits today — neither has the kind of milestone D2Bot has, and this post isn't the place to claim
@@ -193,10 +191,4 @@ a standard can paper over by being better written. The architecture lowers the f
 scaffold shows up in a single day, every time, for any game you point it at. It never guaranteed a
 ceiling. Whether a project actually gets anywhere still depends on someone doing the unglamorous,
 game-specific work that no shared standard can do for them.
-
-I don't think that's a knock against having built the thing. A shared architecture like this one is
-worth building — it's the reason a brand-new game repo starts its life with a StateManager, a
-BotRunner, and a doc-conformance checklist instead of a blank folder, and the reason D2Bot and the
-PSO bot could skip straight past the arguments WWoW already had with itself. It makes the work you
-still have to do per game go faster. It doesn't do that work for you.
 

@@ -155,22 +155,17 @@ one of them, waiting on an answer before it kept going._
 None of this, calibration included, is actually a way to know a model is correct. It's a way to
 know when it's wrong. Every recording matched narrows the space of remaining error without ever
 closing it, because there's always another terrain feature, another edge case not yet recorded,
-where the two diverge again. You can get very good at guess-and-check without the guess ever being
-the right shape — which is roughly what four months of this bought: a model that converged closer
-and closer to the recordings without ever converging exactly, because it was, unknowingly, the
-wrong shape of model entirely.
+where the two diverge again. Four months of this bought a model that converged closer and closer to
+the recordings without ever converging exactly.
 
 ## The kill
 
 The model eventually got a name — PhysX-CCT — on the same day it was killed. There was no gap
 between writing the name down and deleting every reference to it, because naming it was the last
 step of finally being able to say what was wrong with it in one sentence: WoW.exe is not a
-PhysX-style three-pass swept-capsule controller. Every open-source implementation tried before
-this one, and the one built here, assumed something roughly in that family — sweep, detect,
-resolve, slide — because that's the standard shape of the problem in every engine that documents
-how it solves it. That assumption is exactly why months of calibration against real recordings
-produced a model that kept getting closer without ever arriving. The constants weren't imprecise.
-The equation was wrong, and "closer" had been getting mistaken for "almost there."
+PhysX-style three-pass swept-capsule controller. How that sentence got found is its own chapter.
+The constants weren't imprecise. The equation was wrong, and "closer" had been getting mistaken for
+"almost there."
 
 The cleanup ran for weeks afterward — the dead collide-and-slide code came out, the capsule
 primitive itself turned out to be close to whatever Blizzard was actually using for its bounding

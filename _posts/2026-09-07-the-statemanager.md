@@ -14,13 +14,9 @@ The first time I ran more than one bot at once, both of them walked up to the sa
 one knew the other existed. That is the whole problem in one sentence: one bot is a script, and
 five bots are a distributed system, and you find that out the moment you try.
 
-BloogBot, as I inherited it, had no concept of a second bot. Every decision a character made — what
-to kill, where to walk, when to loot — was made entirely inside that character's own process, with
-no way to ask a neighbor what it was doing or tell it to do something else. That is a perfectly
-reasonable design for one farming bot. It falls apart the instant the goal changes from "keep this
-character busy" to "get five characters into a group together," because now somebody has to decide
-who tanks, who waits at the entrance, and who goes first through the door — and that somebody has to
-live somewhere none of the five characters do.
+The last post ended on why BloogBot couldn't do this: there was no channel between bots. Somebody
+has to decide who tanks, who waits at the entrance, and who goes first through the door — and that
+somebody has to live somewhere none of the five characters do.
 
 ## A central hub
 
@@ -128,14 +124,13 @@ a background service — the first sign that not every bot would need a full WoW
 ## Ragefire Chasm, again
 
 Five bots grouped, GM-positioned, and coordinating cleanly through a socket and a heartbeat. It felt
-like the hard part was over. So we sent them into Ragefire Chasm — the easiest instance in the
+like the hard part was over. So we sent them back into Ragefire Chasm — the easiest instance in the
 game, three floors of imps and a kobold boss, the kind of place you clear half asleep on a
 level-twenty character.
 
-They could not finish it. Not because the group logic failed, and not because the StateManager lost
-track of anyone. The bots would path into the dungeon and then stop being able to path at all —
-wedged under an overhang, standing in a dead-end alcove with no way back out, confidently occupying
-a spot that, according to whatever was guiding them, they should not have been able to reach.
+They could not finish it, and not because the group logic failed or the StateManager lost track of
+anyone. They got stuck in the same places the first group had, confidently occupying spots that,
+according to whatever was guiding them, they should not have been able to reach.
 
 The obvious suspect was navmesh generation, and it held up under a little digging. The server's
 navmesh had never needed to be exact, because the only things that had ever used it were

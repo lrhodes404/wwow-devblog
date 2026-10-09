@@ -18,13 +18,9 @@ field has always worked — it is where every offset in every bot I have ever us
 changed was not the technique. What changed was that the tedious part, the part that made it a
 specialist's job measured in months, became something I could delegate.
 
-Claude had already made everything around the physics problem faster — more code shipped per week,
-more of the backlog cleared, the parts of the solution that just needed volume moving at a pace the
-old ChatGPT-and-copy-paste loop never got close to. The physics wall did not care about any of that.
-Throughput does not help you when the thing slowing you down is that you do not know the answer.
-
 The previous two years had a specific shape: I had no ground truth, so I tuned constants against
-symptoms. The binary *is* the ground truth. It had been sitting on my disk the whole time.
+symptoms, and throughput does not help when the thing slowing you down is that you do not know the
+answer. The binary *is* the ground truth. It had been sitting on my disk the whole time.
 
 ## Two years, then forty-eight hours
 
@@ -53,9 +49,7 @@ What is actually in there is older and simpler:
 
 Nobody would write it this way today, which is exactly why guessing failed. Every modern
 open-source physics stack solves a harder, more general problem than the one `WoW.exe` is actually
-solving, and a more general solution does not degrade gracefully into a more specific one — it just
-produces different wrong answers depending on which corner of the general case you happen to be
-tuning against that week. I spent two years reading that instability as a sign I was close.
+solving, and a more general solution does not degrade gracefully into a more specific one.
 
 The base movement numbers turned out to be almost embarrassingly plain once I had them: walking at
 2.5 yards a second, running at 7, a jump impulse of about 7.96 yards per second that becomes about

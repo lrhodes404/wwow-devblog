@@ -10,17 +10,9 @@ mermaid: true
 ---
 
 
-I spent a couple of weeks trying out whatever free WoW bots I could find before it occurred to me
-how stupid that was. I had been a software developer for years at that point. Botting a 2006 game
-client is not a new problem — people have been doing it for close to two decades — so instead of
-downloading another sketchy trial binary, I went looking for source.
-
-I found [Drew Kestell's write-ups](https://www.drewkestell.us/Article/6/Chapter/1). The whole
-botting process, laid out article by article, with the source code sitting right there to read.
-Most of what he described I already understood in the abstract — memory reading, packet
-inspection, that family of technique was not news to me — but seeing it laid out end to end, with a
-working codebase attached to every claim, was a different thing entirely. I cloned the repo that
-night.
+The repo I cloned that night was BloogBot, and [Drew Kestell's write-ups](https://www.drewkestell.us/Article/6/Chapter/1)
+were the reason I picked it: the whole botting process laid out article by article, with a working
+codebase attached to every claim.
 
 My first commit landed in September 2023: *"Basic questing implemented without item use working."*
 Not much of a start, and it did not need to be, because BloogBot already worked before I touched it. It

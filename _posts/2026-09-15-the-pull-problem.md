@@ -9,30 +9,17 @@ tags: [dungeoneering, group-ai, pathfinding, raid-markers]
 ---
 
 
-Bots had been getting stuck in Ragefire Chasm since the very first multi-bot group I put together.
-That was the whole point of the demo back then: five geared-up characters on GM Island, sent into
-RFC together, and within a few pulls at least one of them would wedge itself under an overhang or
-end up somewhere with no path back out. I wrote about the diagnosis earlier — the default server
-navmesh generation wasn't built with the assumption that a unit would actually have to obey the
-game's physics to get somewhere, and Detour/Recast weren't giving me anything better without a lot
-more work than I had patience for at the time. I shelved dungeoneering rather than keep staring at
+Bots had been getting stuck in Ragefire Chasm since the very first five-bot group, for the navmesh
+reasons covered back in "The StateManager," and I shelved dungeoneering rather than keep staring at
 it.
 
-That failure didn't get solved by grinding on it for years. It got easier to solve because the
-physics and scene-data work covered in the last several posts finally gave the navmesh something
-honest to describe. Once that was true, the coordination side of the dungeon problem turned out to
-be tractable in a few weeks. Whether the whole thing actually clears end to end yet is a separate
-question, and I want to answer it honestly rather than let the coordination win read as more than
-it is.
+That failure didn't get solved by grinding on it for years. Once the physics and scene-data work
+from the last several posts gave the navmesh something honest to describe, the coordination side of
+the dungeon problem turned out to be tractable in a few weeks. Whether the whole thing actually
+clears end to end yet is a separate question, and I want to answer it honestly rather than let the
+coordination win read as more than it is.
 
-## The naive attempt, briefly
-
-The original dungeon-crawl code is already covered ground, so I'll just place it in time. Basic
-dungeon crawling first showed up in October 2023, got real pathfinding about ten days later, and
-by mid-November the log records "Working dungeoneering... again" — that "again" doing a lot of
-work, since it means an earlier pass had already regressed once before that. None of this is the
-interesting part. It's the part where five bots walk into RFC and I find out, again, that they
-can't walk back out.
+## The long gap
 
 Dungeon-running then sat untouched for something like twenty months — not because I forgot about
 it, it just wasn't on the list. That stretch covers most of the physics saga and the early
@@ -126,7 +113,5 @@ pieces works on its own and has been tested on its own. Stringing all of it toge
 run of the instance, start to finish, without a human stepping in, hasn't happened yet.
 
 That's a meaningfully different place than three years of "stuck under an overhang," and I don't
-want to undersell it: the exact tool that stranded the first five-bot group is now the tool the
-current group plans its pulls from, which is the whole arc of this post. But it's not the same as
-having cleared the dungeon, and I'd rather say that plainly now than have a future post quietly
+want to undersell it. But it's not the same as having cleared the dungeon, and I'd rather say that plainly now than have a future post quietly
 correct it.

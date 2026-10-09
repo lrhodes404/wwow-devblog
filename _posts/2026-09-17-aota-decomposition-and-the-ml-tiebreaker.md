@@ -11,10 +11,8 @@ mermaid: true
 
 
 Last post drew the line: the StateManager gets to say "run Ragefire Chasm," and everything below
-that sentence belongs to the BotRunner. Objective composition, the Task stack, retries, recovery,
-the terminal result — none of it crosses the wire. What I didn't say is what "run Ragefire Chasm"
-actually turns into once it lands inside that BotRunner-owned box. That's a separate problem, and
-it's the one this post is actually about.
+that sentence belongs to the BotRunner. What I didn't say is what "run Ragefire Chasm" actually
+turns into once it lands inside that box.
 
 ## Four layers, one example
 
@@ -39,9 +37,6 @@ key press, nothing that itself contains a decision. Today there is no `IAction` 
 `Actions/` directory. A Task reaches directly into the object-manager helpers and the packet surface
 to do its work, which is fine and is what's actually shipping, but it means the "Action" layer in
 AOTA is currently a description of what a Task's internals are doing, not a type you can point at.
-When Actions do get their own interface, the design intent is that they never cross a wire even
-once they exist — they're meant to stay entirely local to the BotRunner process, the same as they
-are today by default.
 
 ## The hard one: what counts as an Objective
 

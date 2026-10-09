@@ -86,18 +86,9 @@ Code, do the task," and that's fine for a single repo, but once there were sever
 each with their own conventions and their own agent instructions, treating every task the same way
 started to look wasteful in ways that were hard to see individually and obvious in aggregate.
 
-This post covers the shape of the decision and the one finding worth trusting. The next one covers
-how the CI side of this actually got redrawn — the Jenkins folder structure itself. The post after
-that is where the coordinator and the tools it hands work to get written down properly.
-
 The pilot settled on a small number of real, distinct coding-agent processes rather than one
-default tool doing everything. A primary driver runs at a lower, cheaper effort tier by default and
-only escalates to a more expensive tier when a task actually calls for it. An alternate tool from a
-different model family sits alongside it as a reviewer — not because it's smarter, but because an
-independent second opinion from a genuinely different vendor catches a different set of blind
-spots than asking the same tool to review its own work would. And a separate, cheap tool handles
-read-only bulk research — "where is X defined across these six repos" kind of questions — where
-raw throughput matters a lot more than judgment.
+default tool doing everything — a primary driver, a reviewer from a different model family, and a
+cheap reader for bulk research — which "The Toolchain" lays out in full.
 
 Deciding which of those to use for a given task is backed by a small locally-running service that
 reports how much of each tool's usage budget is left before I commit to routing something to it.
@@ -125,10 +116,4 @@ helps and this post has examples of both. But it means it isn't the default, and
 be the default just because it sounds more capable on paper. It's kept available for the specific
 situations it actually helps, and a single agent working alone stays the baseline for everything
 else until something changes my mind with evidence, not architecture diagrams.
-
-None of these three things make anything faster in a way you'd notice from the outside. What they
-actually do is give verification, runtime, and the growing pile of agent-driven work across an
-increasing number of repos each a real place to happen, instead of all three quietly competing for
-whatever happened to be free on my development machine at the time. That's not a small thing, even
-if it doesn't look like much from here.
 

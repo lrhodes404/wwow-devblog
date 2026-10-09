@@ -48,7 +48,7 @@ Warhammer Online and Global Agenda bots, the five newer scaffolds (Phantasy Star
 EverQuest, EverQuest II, Star Wars Galaxies), and one for the CI configuration, which is a git repo like
 any other and gets the same treatment.
 
-That might look like it contradicts the finding from "The Toolchain" — a coordinator splitting one task
+That might look like it contradicts the finding from "One Overloaded Machine" — a coordinator splitting one task
 across several workers measured over four times slower than a single agent doing the whole thing. It
 doesn't, as far as I can tell. The parallelism here is across repos and across rows that don't share
 files. Nothing splits a single task, and no two writers ever share a worktree.

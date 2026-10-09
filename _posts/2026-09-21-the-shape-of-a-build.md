@@ -18,21 +18,15 @@ sixty job names.
 
 ## Two shapes of game
 
-The split isn't "lobby-based" versus "open world." It's a causal chain running from a game's scale
-straight down to which services a repo needs standing at all.
+This is the MMO versus session-based split from "One Standard, Many Games," seen from the build
+side, and it's a causal chain. A game whose population is dense enough that bots must keep acting
+while nobody's watching needs a background runner; that runner needs SceneDataService for geometry
+in zones it isn't rendering, and large static maps make PathfindingService worth precomputing once.
+One fact about the game (scale) forces two services into existence.
 
-A game needs a background bot runner if its population is dense enough, or its objectives
-long-running enough, that a bot has to keep acting while nobody's watching it. The moment a game
-needs that, two more things become necessary, not optional. A background runner needs scene
-geometry on demand for zones it isn't currently rendering, which is SceneDataService's whole job.
-And separately, a game with large, hand-authored static maps — the same map shared by every player
-and every run — is worth precomputing navigation over once instead of recomputing it per session,
-which is what PathfindingService is for. One fact about the game (scale) forces two services into
-existence.
-
-Games that don't clear that bar skip both. Small groups, no background runner needed, and if the
-map is randomly generated it's usually small enough to query directly through the StateManager as
-a shared fog-of-war rather than precompute and serve. Nothing has to stand and run all the time,
+Games that don't clear that bar skip both. If the map is randomly generated it's usually small
+enough to query directly through the StateManager as a shared fog-of-war rather than precompute and
+serve. Nothing has to stand and run all the time,
 so there's nothing to deploy.
 
 ```mermaid
