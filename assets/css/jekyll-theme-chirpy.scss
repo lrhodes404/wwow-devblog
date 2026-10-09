@@ -366,53 +366,59 @@
   opacity: 1;
 }
 
-/* ---------- Persistent chapter table of contents (panel widget) ----------
-   Lives in the sidebar panel on every page, in the slot the theme's default
-   "recently updated" / "trending tags" widgets used to occupy. */
+/* ---------- Chapter table of contents (left sidebar) ----------
+   Rendered by _includes/sidebar.html in place of the theme's
+   Home/Categories/Tags/Archives tabs. Scrolls on its own so the
+   contact icons below it stay put. */
 
-.chapter-toc__list {
-  max-height: 60vh;
+#chapter-nav {
+  min-height: 0;
   overflow-y: auto;
+  padding: 0 1rem 1rem 2rem;
 }
 
-.chapter-toc__item {
-  margin: 0.15rem 0;
+.chapter-nav__heading {
+  margin: 1.25rem 0 0.5rem 0.5rem;
+  font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  font-size: 0.85rem;
+  font-variant: small-caps;
+  letter-spacing: 0.08em;
+  color: var(--site-title-color);
 }
 
-.chapter-toc__item a {
-  display: block;
-  color: inherit;
+.chapter-nav__item a {
+  display: flex;
+  gap: 0.55rem;
+  align-items: baseline;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  color: var(--sidebar-muted-color);
+  font-size: 0.85rem;
+  line-height: 1.3;
   text-decoration: none;
 }
 
-.chapter-toc__item a:hover .chapter-toc__label {
-  text-decoration: underline;
-  text-decoration-color: var(--blockquote-border-color);
+.chapter-nav__item a:hover {
+  background: var(--sidebar-hover-bg);
+  color: var(--sidebar-btn-color);
 }
 
-.chapter-toc__number {
-  display: inline-block;
-  min-width: 1.4em;
+.chapter-nav__number {
+  flex: 0 0 1.4em;
+  text-align: right;
   font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
   font-weight: 700;
-  color: var(--link-color);
+  color: var(--avatar-border-color);
 }
 
-.chapter-toc__label {
-  font-size: 0.88rem;
+.chapter-nav__item--current a {
+  background: var(--sidebar-hover-bg);
+  color: var(--sidebar-active-color);
+  font-weight: 600;
 }
 
-.chapter-toc__item--current {
-  font-weight: 700;
-  color: var(--heading-color);
-}
-
-.chapter-toc__item--current .chapter-toc__number {
-  color: var(--heading-color);
-}
-
-.chapter-toc__item--current .chapter-toc__label {
-  border-bottom: 1px dotted var(--blockquote-border-color);
+.chapter-nav__item--current .chapter-nav__number {
+  color: var(--sidebar-active-color);
 }
 
 /* ---------- Per-chapter heading (BloogBot-style "Chapter N") ----------
