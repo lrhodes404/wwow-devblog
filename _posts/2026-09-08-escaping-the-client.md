@@ -1,157 +1,111 @@
 ---
-title: "Escaping the Client: Writing a WoW Client That Isn't One"
+title: "Escaping the Client"
+description: "Building a headless client so the fleet could scale past what launching real copies of WoW.exe could ever support."
 date: 2026-09-08 09:00:00 -0400
 series: buildlog
+chapter: 4
 categories: [History]
-tags: [architecture, protocol, srp6, headless, llm]
+tags: [architecture, headless-client, ollama, bots]
 mermaid: true
 ---
 
-After a series of discussions with Jared about where LLMs were going, we landed on the idea the
-project is named after: a server populated by bots, each simulating a character with its own
-personality, human enough that a real player could not tell whether anyone was at the keyboard.
 
-That goal has an immediate and unglamorous consequence. Populating a world means thousands of
-characters, and you cannot run thousands of copies of a 2006 game client. Each one wants a window,
-a GPU context, audio, and something like a gigabyte of memory. The math fails long before the
-interesting part starts.
+The idea came up in conversation with Jared, the way most of the good ones did: a server
+populated by bots, each one simulating a character with its own personality, human enough that
+a real player logged in next to it couldn't tell whether anyone was at the keyboard. We liked it
+immediately and then, about thirty seconds later, ran into the part where it doesn't work.
+Populating a world means thousands of characters. You cannot launch 3,000 copies of a game from
+2006. Each one wants a window, a GPU context, audio, something like a gigabyte of memory, and the
+math fails long before you get anywhere near the interesting problem.
 
-So the bot had to stop being a passenger inside the client and become a client.
+![Two full raid groups of level-60 characters filling both raid frames, with Task Manager showing 64 GB of memory in use](/assets/img/posts/escaping-the-client/wow-background-scaling.png)
+_Two eighty-bot raids at once, each one a real foreground client, and 64 GB already gone before
+either group finished forming up. This is the ceiling the math above is describing, not an
+exaggeration of it._
 
-## What the client actually does for you
+The answer we landed on was a lightweight client — something that could authenticate, exchange
+packets, and follow a navmesh, without any of the overhead of actually being WoW.exe.
 
-Injection gets you the client's *answers*. Remove the client and you inherit all of its
-responsibilities:
+## What the client has to do
 
-1. Authenticate against the login server.
-2. Pick a realm, connect to the world server, establish an encrypted session.
-3. Parse a continuous stream of opcodes.
-4. Maintain an object manager — every unit, player, item, corpse and game object in range, with
-   all of their fields.
-5. Simulate movement and collision well enough that the server believes you.
-6. Answer spatial questions: what is in front of me, can I reach it, am I close enough to interact.
+Injection gets you the client's answers for free. Take the client away and you inherit its job:
+log into the auth server, negotiate a session key, connect to the world, and parse a continuous
+stream of opcodes into something resembling a coherent world — every unit, item, and object in
+range, with fields that update in place rather than arriving whole. Miss one update and there is
+no resync; your copy of the world just quietly diverges from the server's and stays that way. Then,
+on top of that, you have to move the thing convincingly and know when it's close enough to
+interact with something. That last part turned out to be the expensive one, but it took a while to
+find that out.
 
-Items 1 through 4 are work. Item 5 is two years of this blog. Item 6 turns out to depend on 5.
+None of it is glamorous, and none of it looks like the actual point of the project. It's a decade
+of client engineering you're redoing so that the interesting part — a bot that behaves like a
+person — has a body cheap enough to run three thousand of.
 
-## Authentication
+## The other half of that commit
 
-The login server speaks a small binary protocol on **TCP 3724** with no encryption, using **SRP6**
-— Secure Remote Password — so the password itself never crosses the wire and the server never
-stores it:
+The project log shows the shape of this coming together in real time. 2024-07-16: "Working
+headless client POC," a project I named WoWSlimClient. The next two days were spent making it
+modular — clients, object management, and event notifications pulled apart into their own pieces
+before the thing had done anything useful yet, which in hindsight is just how I work.
 
-```
-C → S   CMD_AUTH_LOGON_CHALLENGE (0x00)   username, build, platform
-S → C   challenge response                B, salt, generator, modulus
-C → S   CMD_AUTH_LOGON_PROOF (0x01)       A, M1
-S → C   proof response                    M2
-C → S   CMD_REALM_LIST (0x10)
-S → C   realm list
-```
-
-Both sides derive a shared **session key** from the exchange, and the client proves knowledge of the
-password by computing `M1`; the server proves it too, with `M2`. The session key then encrypts the
-world connection's packet headers.
-
-The build number is submitted in the very first packet, and the server rejects anything it does not
-recognise with `WOW_FAIL_VERSION_INVALID` (`0x09`). The headless client writes **5875** there, which
-is the same hard commitment to 1.12.1 that the offset table represents on the injected side — just
-in a different form.
-
-## Object updates, which are the actual work
-
-The world server's most important message is `SMSG_UPDATE_OBJECT` (`0xA9`), or its zlib-compressed
-sibling `SMSG_COMPRESSED_UPDATE_OBJECT` (`0x1F6`). One packet carries a count followed by that many
-update blocks:
-
-| Value | Type | Meaning |
-|---|---|---|
-| 0 | `UPDATETYPE_VALUES` | Field values changed |
-| 1 | `UPDATETYPE_MOVEMENT` | Position/movement only |
-| 2 | `UPDATETYPE_CREATE_OBJECT` | Object created |
-| 3 | `UPDATETYPE_CREATE_OBJECT2` | Object created (self) |
-| 4 | `UPDATETYPE_OUT_OF_RANGE_OBJECTS` | Leaving visibility |
-| 5 | `UPDATETYPE_NEAR_OBJECTS` | Entering visibility |
-
-Each object has a descriptor array whose size depends on its type — and the sizes are not small:
-
-| Type | Descriptor fields |
-|---|---|
-| `TYPEID_ITEM` | 48 |
-| `TYPEID_CONTAINER` | 116 |
-| `TYPEID_UNIT` | 188 |
-| `TYPEID_PLAYER` | **1,276** |
-| `TYPEID_GAMEOBJECT` | 32 |
-| `TYPEID_CORPSE` | 38 |
-
-A values update does not send all 1,276 fields. It sends a bitmask of which indices changed,
-followed by only those values, and you apply them to your local copy. Which means: **you cannot
-recover from a missed packet.** There is no full-state resync. If you mis-parse one update block,
-your view of the world silently diverges from the server's and stays diverged. Every bug in this
-layer is a bug that shows up ten minutes later as inexplicable behavior.
-
-This is the part where "the client has already done this for you" stops sounding like a convenience
-and starts sounding like a decade of work you are re-doing.
-
-## The commit that mattered
-
-On 2024-08-07 I committed *"Refactored app to utilize BackgroundServices and moved BotRunner behind
-interfaces"*. That message undersells itself. Putting the behavior engine behind an interface is the
-architectural decision the entire project now rests on:
+Then, on 2024-08-07, I committed "Refactored app to utilize BackgroundServices and moved BotRunner
+behind interfaces." If that date looks familiar, it's because the last post described the other
+half of the same day's work — the StateManager and BotRunner naming split happened here too. What
+I didn't dwell on there is what "behind interfaces" actually bought: the behavior engine, the part
+of a bot that decides what to do, no longer has any idea what it's driving. Above the interface,
+one brain. Below it, two possible bodies.
 
 ```mermaid
 flowchart TB
-  BR["BotRunner<br/><i>behavior engine — decides what to do</i>"]
-  GD["Game interfaces<br/><i>IObjectManager, IWoWUnit, ...</i>"]
-  BR --> GD
-  GD --> FG["Foreground runtime<br/>injected into WoW.exe<br/>memory reads + client calls + Lua"]
-  GD --> BG["Background runtime<br/>no game client<br/>packets + own physics"]
-  FG --> W["WoW.exe — ground truth"]
-  BG --> S["VMaNGOS server"]
-  FG -.->|"packet captures become<br/>the parity baseline"| BG
+  BR["BotRunner<br/>decides what to do"]
+  I["Game interfaces"]
+  BR --> I
+  I --> FG["Foreground client<br/>injected, memory reads"]
+  I --> BG["Background client<br/>no client, packets only"]
+  FG -.->|"packet captures set the baseline"| BG
 ```
 
-One brain, two bodies. Everything the bot *decides* sits above the interface and has no idea which
-runtime it is attached to. Below it, either a real client driven through process memory or a headless
-client driven through packets.
+Two days later, on 2024-08-09, the headless client was running as a BackgroundService, and
+WoWSharpClient shows up in the log — the name it still goes by. The foreground runtime stayed
+ground truth, because it's the real game and whatever it does is correct by definition. The
+background runtime was the one built for scale, and everything it did had to be checked against
+packet captures taken from the foreground side, since that was the only way to know whether a
+reimplementation was actually right rather than just plausible.
 
-You need both, and the reason is epistemic rather than practical. The foreground runtime is the real
-game: whatever it does is correct by definition. The background runtime is the one that scales.
-Captures from the first are the specification the second must satisfy — which is the only way to
-answer "is my reimplementation right?" without guessing.
-
-The project timeline follows: 2024-07-16, *"Working headless client POC"*, then called
-**WoWSlimClient**. A day later it was modular. Two days after that, clients, object management, and
-event notification were separated. By 2025-05-17, *"Working character creation"* — the headless
-client could create its own characters rather than borrowing existing ones.
+![Two characters fishing side by side off the dock at Ratchet, one a manually-played foreground client and one a background bot mirroring it](/assets/img/posts/escaping-the-client/wow-fishing.png)
+_This is what checking the background runtime against the foreground one actually looked like in
+practice — the same small, repeatable action running on both, side by side, so any divergence
+between them had nowhere to hide._ Character creation followed
+almost a year later, on 2025-05-17 — the headless client could finally make its own characters
+instead of borrowing ones I'd made by hand. By 2025-06-02 the whole thing got rearranged into the
+Exports and Services layout still in use today, which is a less interesting sentence than the
+work it represents.
 
 ## Talking to it
 
-On 2024-08-16: *"Working Ollama integration with chat"*.
+On 2024-08-16 the log says "Working Ollama integration with chat," which undersells what that
+afternoon actually felt like. Chat is a simple subsystem as WoW protocol goes — an opcode, a
+message type, a string — so wiring it to a locally running Ollama instance wasn't much code. I
+piped incoming chat packets into the model and sent whatever came back out the other side as a
+whisper.
 
-Chat is a pleasant subsystem to implement because it is genuinely simple — an opcode with a message
-type, a language id, and a string. I wired incoming chat to a locally running Ollama instance and
-piped the response back out.
+Then I logged in with my real character and said something to it.
 
-The result was a character standing in the world, with no game client involved anywhere, holding a
-conversation. It is the first time the project felt like the thing it was named after rather than an
-automation tool. It also set a boundary I have kept since: the model writes **words**, never
-actions. Nothing an LLM produces is allowed to decide what a character does. That constraint is
-about reproducibility more than safety — a system whose decisions come from a sampled distribution
-cannot be regression tested, and this project lives or dies on being able to tell whether a change
-made things better.
+There was no client rendering the thing that answered me. No window, no character model loading
+in, nothing but a name standing in the world and a response coming back that made sense in
+context. It's the first time in the whole project that it felt like the thing it was named after,
+rather than an automation tool with a good elevator pitch. I've kept one rule since that afternoon:
+the model writes words, never actions. Nothing an LLM produces gets to decide what a character
+does, mostly because a system whose behavior comes from a sampled distribution can't be regression
+tested, and this project only survives if I can tell whether a change made something better or
+worse.
 
-## The wall
+Movement was next, and it's where I stalled for two years. Open-source collision code didn't agree
+with Blizzard's geometry, and the failures didn't look like a bad implementation — they looked
+like a tuning problem, which is worse, because it invites you to keep tuning. The stopgap was
+having the background client ask the navmesh what height to stand at instead of solving collision
+properly, and that held up right up until it didn't: a navmesh tells you where a character may
+stand, not how it falls, how far it slides, or whether the ledge in front of it is climbable. Those
+are physics questions, and I didn't have physics yet. Which meant, eventually, physics had to
+actually work.
 
-Then I started on movement, and stopped for two years.
-
-I knew very little about 3D engines and had only dabbled in Unreal and Unity. I tried adapting
-open-source collision code and what I implemented was clearly not compatible with Blizzard's
-geometry — the results varied, which is the worst possible outcome because it looks like a tuning
-problem. I kept testing by having the background client use the navmesh to decide what height to
-stand at, which works on open ground and fails everywhere that matters.
-
-A navmesh tells you where a character *may* stand. It does not tell you how one falls, how far it
-slides off a ledge, whether a step is climbable, or whether the thing in front of it is close enough
-to talk to. Those are physics questions, and I did not have physics.
-
-{% include series-nav.html %}

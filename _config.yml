@@ -28,8 +28,7 @@ url: "https://lrhodes404.github.io"
 github:
   username: lrhodes404
 
-twitter:
-  username: twitter_username # change to your Twitter username
+# twitter: unused — the sidebar contact icon now points at Twitch instead (see _data/contact.yml)
 
 social:
   # Change to your full name.
@@ -156,7 +155,9 @@ pwa:
     deny_paths:
       # - "/example"  # URLs match `<SITE_URL>/example/*` will not be cached by the PWA
 
-paginate: 10
+# Pagination is disabled: the home page is a chapter index (see _layouts/home.html),
+# not a paginated, date-ordered post feed.
+# paginate: 10
 
 # The base URL of your site
 baseurl: "/wwow-devblog"

@@ -1,11 +1,14 @@
 ---
-title: "Westworld of Warcraft"
+title: "Lore"
+description: "How fifteen years of playing, botting, and walking away from World of Warcraft turned into the reason this project exists."
 date: 2026-09-05 09:00:00 -0400
 series: buildlog
+chapter: 1
 categories: [Origin]
 tags: [wow, bots, origin]
 pin: true
 ---
+
 
 World of Warcraft was my first MMORPG. As a huge fan of Warcraft, and Blizzard in general, it was
 inevitable that I would play the game. At one point, it was my motivating factor to move out of my
@@ -88,7 +91,7 @@ content, etc. I didn't want a second job, so I would swear off MMOs entirely.
 ## Ten years later
 
 Fast-forward nearly 10 years and my brother and I are reminiscing. I'm not sure how it came up, but
-I was streaming Warhammer Online: Return of Reckoning and was really enjoying that. I simply loved
+I was streaming Warhammer Online: Return of Reckoning and was really enjoying that. I loved
 the big player battles and city sieges. As was customary, I played a shaman, and I had the time to
 farm a little for materials and spent most of my time on stream doing warband PUGs. I experimented
 with a bot for WAR but never intended on using it, as the RoR gameplay loop didn't require it and,
@@ -125,4 +128,3 @@ this blog is about.
 > the credits on the [about page]({{ site.baseurl }}/about/).
 {: .prompt-info }
 
-{% include series-nav.html %}

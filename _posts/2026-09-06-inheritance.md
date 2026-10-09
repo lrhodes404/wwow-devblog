@@ -1,129 +1,89 @@
 ---
-title: "Inheritance: What a WoW Bot Actually Is"
+title: "Inheritance"
+description: "Cloning Drew Kestell's BloogBot, and the one-process, one-character architecture it was built to outgrow."
 date: 2026-09-06 09:00:00 -0400
 series: buildlog
+chapter: 2
 categories: [History]
 tags: [bloogbot, architecture, injection, memory]
 mermaid: true
 ---
 
-The most important decision I made in the first year was not writing anything.
 
-[BloogBot](https://www.drewkestell.us/Article/6/Chapter/1) already worked. It leveled a character,
-fought, looted, and ran back to its corpse. Starting from someone else's working thing meant the
-first problem I had to solve was a real one instead of a solved one. My first commit landed
-2023-09-20 — *"Basic questing implemented without item use working"* — and two weeks later, on
-2023-10-04, I renamed the solution to **RaidLeaderBot**. That rename is the thesis of the next two
-years. I did not want a farming bot. I wanted a raid.
+I spent a couple of weeks trying out whatever free WoW bots I could find before it occurred to me
+how stupid that was. I had been a software developer for years at that point. Botting a 2006 game
+client is not a new problem — people have been doing it for close to two decades — so instead of
+downloading another sketchy trial binary, I went looking for source.
 
-Before any of that makes sense, it is worth explaining what a bot of this kind actually is, because
-"bot" covers at least three unrelated architectures and only one of them is this.
+I found [Drew Kestell's write-ups](https://www.drewkestell.us/Article/6/Chapter/1). The whole
+botting process, laid out article by article, with the source code sitting right there to read.
+Most of what he described I already understood in the abstract — memory reading, packet
+inspection, that family of technique was not news to me — but seeing it laid out end to end, with a
+working codebase attached to every claim, was a different thing entirely. I cloned the repo that
+night.
 
-## Three ways to automate a game client
+My first commit landed 2023-09-20: *"Basic questing implemented without item use working."* Not
+much of a start, and it did not need to be, because BloogBot already worked before I touched it. It
+leveled a character, fought, looted, ran back to its corpse when it died. The most important
+decision I made in that first stretch was not writing anything — starting from someone else's
+working thing meant my first problem was a real one, not a solved one.
 
-**Pixel and input automation.** Read the screen, move the mouse, press keys. Requires nothing of the
-game, breaks the moment a window moves or a UI scale changes, and cannot see anything the screen
-does not show. This is what most people picture, and it is the weakest option.
+The clone kept its history, which is a strange thing to sit with in retrospect. Drew's own commits
+are still in there — something like 35 to 46 of them, from 2021-06-07 through mid-2023, under his
+own name. My "inheritance" was not a description I copied from a README. It is a git log with two
+authors in it, and for the first year the second author was doing almost nothing that the first
+author hadn't already made possible.
 
-**Protocol emulation.** Skip the client entirely, speak the server's wire protocol yourself. Scales
-enormously — no rendering, no sound, no GPU — but you must reimplement everything the client does,
-and any behavior you get wrong is a behavior the server may notice. (This becomes the project's
-whole second half. It is a later post.)
+Two weeks after that first commit, on 2023-10-04, I renamed the solution. The commit message says
+*"Refactored solution to better describe projects,"* which undersells it — the project stopped
+being called BloogBot and became **RaidLeaderBot**. That rename is the whole thesis of the next two
+years, stated before I had any idea how to deliver on it. I did not want a bot that farmed. I wanted
+a raid.
 
-**In-process automation.** Load your own code *into the game's address space* and read the client's
-own memory. The client has already parsed the protocol, built its object tables, and computed the
-world state. You are reading the answers rather than deriving them.
+## What a bot like this actually is
 
-BloogBot is the third kind, and so is every serious bot of the era.
+Before any of that makes sense you need to know what kind of automation BloogBot is, because "bot"
+covers at least three unrelated architectures and people conflate them constantly.
 
-## The injection chain
+There is pixel and input automation — read the screen, move the mouse, press keys. It requires
+nothing of the game and sees nothing the game does not choose to render, so it breaks the moment a
+window moves. There is protocol emulation — skip the client, speak the server's wire protocol
+yourself, which scales enormously but means reimplementing everything the client does for you for
+free. That becomes this project's whole second act, much later. And there is in-process automation:
+load your own code into the game's address space and read the client's own memory, so you inherit
+its parsed protocol, its object tables, its computed world state, for nothing. BloogBot is the
+third kind, and so was every serious bot of that era.
+
+Concretely, it looked like this. A WPF Bootstrapper launches `WoW.exe`, then uses
+`CreateRemoteThread` to force the process to load a native Loader DLL. The Loader starts the .NET
+CLR inside the game process — a managed, garbage-collected runtime sharing an address space with a
+2006 C++ game, which still strikes me as slightly absurd — and hands control to a managed BloogBot
+assembly. From that point your C# is running inside `WoW.exe` with full read/write access to its
+memory and the ability to call the client's own functions.
 
 ```mermaid
 flowchart LR
   B["Bootstrapper (WPF)<br/>launches the client"] -->|"CreateRemoteThread"| W["WoW.exe 1.12.1<br/>build 5875"]
   W --> L["Loader.dll (C++)<br/>hosts the CLR in-process"]
-  L --> C["Managed bot assembly<br/>MemoryManager · HackManager<br/>Detour · Navigation"]
+  L --> C["Managed bot assembly<br/>MemoryManager · Detour · Navigation"]
   C --> P["Class profile DLL<br/>FrostMageBot, ArmsWarriorBot, ..."]
-  C --> D[("SQLite / SQL<br/>hotspots, NPCs, spawns")]
 ```
 
-The sequence is: start the game process, allocate memory inside it, write the path of a native DLL
-into that memory, and call `CreateRemoteThread` pointed at `LoadLibrary` with that path as the
-argument. The target process loads your DLL as if it had always meant to. That native DLL then
-starts the .NET runtime *inside the game process*, which is the part that still strikes me as
-slightly absurd — a managed garbage-collected runtime sharing an address space with a 2006 C++
-game — and hands control to a managed assembly.
+Everything past that point is addresses. Somewhere in a 342-line table sat entries like a player's
+class byte at virtual address `0x00C27E81`, or a movement structure at offset `0x9A8` from the
+player's base pointer — one a fixed location in the loaded image, the other a displacement you add
+after you've already found the object. Every single one of those numbers is true only for build
+**1.12.1 (5875)**, which is also why the client had to be x86: a fact that ended up dictating parts
+of this project's architecture years after anything still touched the actual client. Reading state
+this way is simple. Writing is not, because you are mutating a program's internals from a thread it
+does not know exists, so BloogBot leaned on three techniques — direct memory writes for simple
+state, marshaled calls into the client's own functions for anything requiring its internal logic,
+and Lua execution for whatever the UI already exposed, since the whole interface is Lua and you can
+call what it calls.
 
-From that moment your C# is running inside `WoW.exe`, with full access to its memory, and can call
-the client's own functions.
-
-## Offsets, and why exactly build 5875
-
-Once you are inside the process, the game's state is just bytes at addresses. Finding the right
-addresses is the entire game:
-
-```csharp
-public static class Offsets
-{
-    public static class Player
-    {
-        // Local player class byte, WoW.exe build 5875 VA 0x00C27E81.
-        public static nint Class       = 0xC27E81;
-        public static nint IsIngame    = 0xB4B424;
-        public static nint IsGhost     = 0x835A48;
-        public static nint Name        = 0x827D88;
-        public static nint TargetGuid  = 0x74E2D8;
-
-        // Corpse world-position globals, VAs 0x00B4E284..0x00B4E28C.
-        public static nint CorpsePositionX = 0x00B4E284;
-        public static nint CorpsePositionY = 0x00B4E288;
-        public static nint CorpsePositionZ = 0x00B4E28C;
-
-        // CMovementInfo base on the player object, build 5875 offset +0x9A8.
-        public static int MovementStruct = 0x9A8;
-    }
-}
-```
-
-Two kinds of number live in that table and the distinction matters. `0x00C27E81` is a **virtual
-address** — a fixed location in the loaded image, valid because this binary does not use ASLR.
-`0x9A8` is a **structure offset** — a displacement from the start of an object, so you read the
-player's base pointer and then add `0x9A8` to reach its movement info.
-
-That file is 342 lines of numbers, and every one of them is true only for build **1.12.1 (5875)**.
-A different build shifts everything. This is the single hardest constraint in the project and the
-reason "just support The Burning Crusade" is not a small feature — it is a second table, obtained
-the same painful way the first one was.
-
-It also explains a constraint that propagates absurdly far: the 1.12.1 client is a 32-bit process,
-so anything injected into it must be **x86**. Three years later that fact still dictates the
-architecture of test projects that never touch the client.
-
-## Reading, writing, and calling
-
-Reading is straightforward once you have addresses. Writing is where it gets interesting, because
-the client is a program with invariants, and you are mutating its state from a thread it does not
-know about.
-
-Three techniques stack up:
-
-- **Direct memory read/write** for state: health, position, target GUID, whether you are in the
-  world, whether you are a ghost.
-- **Function calls into the client** for actions that require the game's own logic — the client's
-  internal calling conventions include `__thiscall` and `fastcall` variants that C# cannot express
-  natively, which is why a tiny native shim exists purely to marshal those calls (and to wrap them
-  in structured exception handling, because an incorrect call crashes the game rather than throwing).
-- **Lua execution** for things the UI already exposes, since the client embeds a Lua interpreter
-  and the entire game interface is written in it. If the UI can do it, you can call the same
-  function the UI calls.
-
-There is also the detour mechanism — rewriting the first instructions of a client function to jump
-into your code first. That is how you observe events rather than poll for them.
-
-## The behavior layer
-
-Behavior lived in per-class DLLs, one project per spec, twenty-odd of them. `FrostMageBot`,
-`ArmsWarriorBot`, `BackstabRogueBot`. Each ran a flat state machine:
+Behavior itself lived one level up, in per-class DLLs — `FrostMageBot`, `ArmsWarriorBot`,
+`BackstabRogueBot`, twenty-odd of them — each running a flat state machine against a hotspot
+database of leveling zones and patrol routes:
 
 ```
 // The whole bot loop, 2021-style. Pseudocode, but not by much.
@@ -138,25 +98,68 @@ while (attached) {
 }
 ```
 
-Supporting that was a hotspot database: regions annotated with level ranges, patrol waypoints, and
-nearby vendor and innkeeper NPCs. The bot picked a hotspot appropriate to its level, ground there,
-and moved on when it outgrew it. That is a complete design for a solo leveling bot, and it is worth
-saying that it works — this is not a strawman I am about to knock down.
+That is a complete design for a solo leveling bot, and it worked. It is not a strawman I inherited
+so I could knock it down.
+
+## Building RaidLeaderBot
+
+The rename a couple of weeks earlier wasn't a find-and-replace, and it didn't happen by itself.
+Jared's first real contribution to the project landed a few days before it: a new controller
+process with its own socket server, so the thing launching a character could stay connected to it
+afterward instead of firing it off and hoping. A few days after that I added the ability to send a
+login command to an already-running instance remotely instead of typing it by hand — a small,
+one-line interface change, repeated across every single class-bot file, because "log in" had to
+mean the same thing whether a human typed it or the controller did. A `Role` enum showed up in the
+models the same day, unused by anything yet. The concept of a character having a role beyond
+"whichever class it happens to be" existed in the codebase before there was anything resembling a
+raid to assign roles in.
+
+Jared followed that, the same night, by rewriting the controller's UI from a single character
+console into an actual collection view — a bindable list, one row per launched instance, instead of
+hunting through however many separate windows happened to be open. That's a small, unglamorous
+change, and it's the one that actually mattered: the moment you can see five characters in one
+list instead of five separate windows, you start thinking about them as a group whether the code
+underneath supports that yet or not.
+
+The rename itself, when it landed, was the least dramatic-sounding commit of the bunch by message
+and the largest by almost any other measure — north of nine hundred files touched, well over a
+hundred thousand lines added. Most of that was mechanical, files sliding into place under new
+project names. Not all of it, though: the bot's core picked up a real object model on the way
+past — a player class running several hundred lines, a base unit class not far behind it, a proper
+memory wrapper — replacing thinner versions that used to live scattered through the old BloogBot
+project. The names chosen for the two halves are worth sitting with. The controller became
+**RaidLeaderBot**. The thing that used to be BloogBot became **RaidMemberBot**. Leader and Member,
+chosen months before "StateManager" and "BotRunner" existed as words, for close to the same split
+those two names would eventually formalize. I hadn't planned that split on purpose. I just already
+knew, without having a name for it yet, that one part of this was going to give orders and the
+other part was going to carry them out.
 
 ## Where the design ends
 
-Look at the diagram again and notice what is missing: there is no channel between two bots, because
-there was never meant to be a second one.
+Look at the diagram again and notice what is not in it: there is no channel between two bots,
+because the design never assumed there would be a second one. A state machine like that is a
+function of one character's own local state, and that holds up fine right until the correct action
+depends on *another* character's state. A tank that has no idea whether the healer is drinking is
+not a tank, it is a warrior standing in front of something. A five-person pull needs one bot to
+decide when to pull, four others to know a pull has been called, and all five to agree on the
+target, and none of that is expressible by adding more cases to that switch statement. The missing
+piece is not a state. It is a channel, and building one changes what kind of system you are
+building.
 
-A state machine is a function of one character's local state. That is sufficient right up until the
-correct action depends on *another character's* state. A tank that does not know whether the healer
-is drinking is not a tank; it is a warrior standing in front of something. A five-person pull
-requires that one bot decides when to pull, that four others know a pull has been called, and that
-all five agree on the target.
+That is the gap the RaidLeaderBot rename was betting on closing, and it is a difference in kind, not
+degree. Leveling a character solo and running a group dungeon are not the same problem at different
+sizes; they are different problems that happen to share a character model.
 
-None of that is expressible as `switch (currentState)`. It is not a matter of adding more states,
-either — the missing thing is not a state, it is a *channel*, and adding one changes what kind of
-system you are building. The next thing I wrote turned a bot into a distributed system, with all
-the problems that implies.
+I found that out directly, and not from anything in the commit history — there is no ticket for
+this one, it lives only in memory. A group of five bots, ported to GM Island and geared up with GM
+commands, went into Ragefire Chasm together. They got in fine.
 
-{% include series-nav.html %}
+![Four bots fighting Earthborer in Ragefire Chasm, all at full health](/assets/img/posts/inheritance/wow-dungeoneering.png)
+_Five characters, one raid frame, and a switch statement each — this is what "got in fine" looked
+like, right before it stopped looking like that._
+
+They did not get out — stuck under overhangs, wedged into dead-end corners, going nowhere I could
+path them back out of. I shelved the project rather than keep chasing it right then. What was
+actually wrong with the navmesh, and what it took to even name the problem properly, belongs to
+what came after.
+

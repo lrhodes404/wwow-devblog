@@ -1,24 +1,52 @@
 ---
-title: "The StateManager, and the Bug That Took Two Years to Name"
+title: "The StateManager"
+description: "Coordinating five bots instead of one, and the first sign that the real problem was never coordination."
 date: 2026-09-07 09:00:00 -0400
 series: buildlog
+chapter: 3
 categories: [History]
-tags: [architecture, protobuf, ipc, navmesh, recast]
+tags: [architecture, protobuf, ipc, coordination]
 mermaid: true
 ---
 
-One bot is a script. Five bots is a distributed system, and you find that out immediately.
 
-I needed something to manage the state of each bot so it knew what to do next. My brother Jared had
-a proof of concept using Google protobuf to exchange messages between processes, and that became
-the foundation. The dates are close together: 2024-06-23, Jared's *"initial commit"* — a C++
-ActivityManager, a generated protobuf runtime, and a `communication.proto` twenty lines long.
-2024-06-25, *"Refactor to separate roles into different apps"*. 2024-06-27, *"Working build after
-refactor"*. 2024-07-07, *"Working client launching"*.
+The first time I ran more than one bot at once, both of them walked up to the same wolf. Neither
+one knew the other existed. That is the whole problem in one sentence: one bot is a script, and
+five bots are a distributed system, and you find that out the moment you try.
 
-## The original contract
+BloogBot, as I inherited it, had no concept of a second bot. Every decision a character made — what
+to kill, where to walk, when to loot — was made entirely inside that character's own process, with
+no way to ask a neighbor what it was doing or tell it to do something else. That is a perfectly
+reasonable design for one farming bot. It falls apart the instant the goal changes from "keep this
+character busy" to "get five characters into a group together," because now somebody has to decide
+who tanks, who waits at the entrance, and who goes first through the door — and that somebody has to
+live somewhere none of the five characters do.
 
-This was the entire inter-process vocabulary:
+## A central hub
+
+The fix started small and stayed small for a while. Nine days after my first commit, on
+2023-09-29, the message is *"Big change to make bots communicate from central hub."* That is the
+actual birth of coordination in this project — not a design doc, not a diagram, just a commit
+message admitting that bots talking to each other was now the blocker. Progress after that came in
+the kind of increments that look unglamorous in a log and felt enormous at the time: *"Basic
+dungeon crawling implemented"* on 2023-10-10, *"Functional dungeon pathfinding implemented"* on
+2023-10-21. By November the hub had a name. 2023-11-08: *"Clients launching from ActivityManager and
+logging in."* Not the StateManager — that name did not exist yet. It was the ActivityManager, and
+for the better part of a year that is what I called the thing that told bots what to do.
+
+It was not stable. A week after clients were launching cleanly, the log reads *"Working
+dungeoneering... again"* on 2023-11-15 — and that "again" is doing a lot of work. Something that had
+worked stopped working, badly enough that getting it back was its own commit. I don't have a clean
+memory of what regressed; what I have is the git record admitting it happened, which is more than I
+had before I went looking.
+
+## The name changes, the shape changes
+
+The ActivityManager sat there, mostly working, for months. What actually rebuilt it was not a
+decision I made — it was Jared, coming back to the project with a proof of concept for how the
+pieces should actually talk to each other. On 2024-06-23 his initial commit lands a C++
+ActivityManager, a generated protobuf runtime, and a file called `communication.proto` that was
+twenty lines long. Here it is in full, because it is short enough to just show:
 
 ```protobuf
 syntax = "proto3";
@@ -35,123 +63,91 @@ message UniversalMessage {
 }
 ```
 
-An opaque payload, an error channel, and a `oneof` to tell them apart. That is a deliberately empty
-design — it says "two processes will exchange bytes and occasionally report failure" and defers
-every real decision. For a first version that is correct. You do not know your message taxonomy on
-day one, and encoding a guess into a wire format is worse than encoding nothing.
+An opaque payload, an error channel, and a `oneof` to tell the two apart. It commits to almost
+nothing — it says "two processes will exchange bytes and occasionally report failure" and leaves
+every real decision for later, which is exactly right for a first version. You do not know your
+message taxonomy on day one, and guessing it into a wire format is worse than leaving it out. That
+same file has since grown into something considerably larger, across several files, and I will get
+to that in a later post. In June of 2024 it was twenty lines, and that was enough to build on.
 
-## Framing
+Two days after the proto landed, on 2024-06-25, the commit message says *"Refactor to separate
+roles into different apps."* That is the sentence where the StateManager is actually born as its
+own named thing, separate from whatever runs inside the bot itself — nine months after the
+ActivityManager concept first showed up in the log, and under a different name from the one it
+started with. 2024-06-27 confirms the split builds: *"Working build after refactor."* By
+2024-07-07, *"Working client launching"* again, this time from the new shape.
 
-Protobuf is a serialization format, not a transport. It does not tell you where one message ends
-and the next begins, so you need framing. The frame has grown a little since, and the current shape
-is worth showing because every decision in it was forced by something going wrong:
+## What the StateManager actually does
 
-```
-+------------------+----------------------+------------------------------+
-| Length (4 bytes) | Compression (1 byte) | Payload (N bytes)            |
-|   int32, LE      | 0x00 raw, 0x01 gzip  | protobuf, raw or gzipped     |
-+------------------+----------------------+------------------------------+
-```
-
-The length counts the flag byte plus the payload, not itself, so the wire total is `4 + length`.
-Compression is applied only when the raw protobuf exceeds **1024 bytes** *and* only when the result
-is actually smaller — gzip on a 200-byte message is a reliable way to make it bigger. A frame is
-capped at **16 MiB**, and the same cap is applied to the *decompressed* size, so a gzip bomb cannot
-be used to exhaust memory on the receiving side. The decoder also accepts legacy frames with no
-flag byte: if the first byte is neither `0x00` nor `0x01`, the whole buffer is treated as raw
-protobuf.
-
-That last detail is a small monument to having shipped a format and then changed it.
-
-## The coordination loop
+Strip away the renames and the architecture underneath them is small enough to say in one
+paragraph. The StateManager launches a WoW.exe process and injects the bot's loader DLL into it,
+passing just enough in the launch arguments for the injected code to find its way back —
+an address and a port, nothing more. Once the bot is running, it opens a socket to the StateManager
+and starts heartbeating its own state back on a loop. The StateManager's own loop does the other
+half of the job: walk the roster, and for any bot whose reported state says it needs a next task,
+assign one.
 
 ```mermaid
 sequenceDiagram
   participant SM as StateManager
   participant P as WoW.exe + injected bot
-  SM->>P: launch process
-  SM->>P: inject loader, pass endpoint as args
-  P->>SM: connect, register account
+  SM->>P: launch process, inject loader
+  P->>SM: connect, heartbeat state
   loop every tick
-    P->>SM: heartbeat (current state)
-    SM->>SM: walk roster, decide next task
-    SM-->>P: assign task (only when it changes)
+    SM->>SM: walk roster, check state
+    SM-->>P: assign next task
   end
 ```
 
-A bot launches knowing just enough to find the StateManager. It connects, then heartbeats its state.
-The StateManager's loop walks the roster and assigns a next task to anything whose state says it
-needs one. Assignment is edge-triggered — the StateManager only speaks when the answer changes,
-which keeps the channel quiet and makes the logs readable.
+That's the entire coordination model. No scheduler, no priority queue, no negotiation between
+bots — just a socket, a heartbeat, and one loop deciding what happens next for whoever needs
+something. It is not a clever design. It is barely a design at all, and it was enough: within a few
+weeks of the split, five bots were grouping up together and using GM commands to position
+themselves, something that had been completely out of reach under the old single-process model.
 
-The socket layer ended up with several server implementations for different pressure: a synchronous
-thread-per-connection server, an async pipelined one built on `System.IO.Pipelines` with a 4096
-connection backlog, and a reactive streaming variant. Same wire format for all three. The pipelined
-one exists because thread-per-connection is fine for five bots and absurd for five hundred.
+The rest of that summer is the terms settling into what they still are. By early August the
+solution had grown into WoWStateManager, WoWStateManagerRunner, WoWStateManagerUI,
+WoWActivityManager, a BaseSocketServer, and a MaNGOSDBDomain project — the ActivityManager name
+survived, but only as a role underneath the StateManager, not as the thing running the show.
 
-It worked. It did not take long to get five bots grouped up and positioning themselves with GM
-commands.
+![An early WoWStateManagerUI config editor showing a roster of RFCBOT1-10 and Big-Five personality-trait sliders per bot](/assets/img/posts/the-statemanager/wowstatemanagerui-config-editor-original.png)
+_The earliest version of that UI, editing a roster literally named RFCBOT1 through RFCBOT10 — the
+group that was about to go back into Ragefire Chasm. Underneath class and race sits a set of
+Openness/Conscientiousness/Extraversion/Agreeableness/Neuroticism sliders per bot, which is a much
+earlier and much smaller-scale version of the "give every character a distinct personality" idea
+than anything in this post's architecture — it existed as a config field years before it was
+anything the BotRunner actually had to reckon with._
+2024-08-07 is the day both formal terms land in the same commit message: *"Refactored app to
+utilize BackgroundServices and moved BotRunner behind interfaces."* Same day, a second commit:
+*"ActivityManagers launching from StateManager."* That is the StateManager/BotRunner split as it
+exists from here forward — the StateManager owns the roster and the tasking, the BotRunner owns
+whatever a specific bot does with a task once it has one. Two days later, 2024-08-09, *"Refactored
+to launch headless client as BackgroundService"* — the first sign that not every bot would need a
+full WoW.exe window forever. That thread belongs to the next post. I'm not going to pull on it here.
 
-## And then Ragefire Chasm
+## Ragefire Chasm, again
 
-After a few months I stalled. The bots entered Ragefire Chasm — a low-level instance, the simplest
-dungeon in the game — and could not complete it. They got stuck. Wedged under overhangs. Standing
-in places with no path out.
+Five bots grouped, GM-positioned, and coordinating cleanly through a socket and a heartbeat. It felt
+like the hard part was over. So we sent them into Ragefire Chasm — the easiest instance in the
+game, three floors of imps and a kobold boss, the kind of place you clear half asleep on a
+level-twenty character.
 
-My diagnosis at the time was "something is wrong with navmesh generation", which was correct and
-useless. I spent a long time in Recast and Detour trying to fix pathing that was not the problem.
+They could not finish it. Not because the group logic failed, and not because the StateManager lost
+track of anyone. The bots would path into the dungeon and then stop being able to path at all —
+wedged under an overhang, standing in a dead-end alcove with no way back out, confidently occupying
+a spot that, according to whatever was guiding them, they should not have been able to reach.
 
-Here is the actual answer, and I did not have it for two years.
+The obvious suspect was navmesh generation, and it held up under a little digging. The server's
+navmesh had never needed to be exact, because the only things that had ever used it were
+server-controlled — creatures the game simply places wherever the server says, without needing them
+to actually obey collision. My bots were not that. They were driving a real client through real
+geometry, and a mesh that was close enough for a mob that doesn't need to fit through a doorway is
+not close enough for one that does.
 
-A navigation mesh is not a map of the world. It is a map of *where a particular agent can stand*,
-baked for a specific agent size. The generator erodes the walkable surface inward by the agent's
-radius and discards anything with less headroom than the agent's height. Change the agent
-dimensions and you get a completely different mesh from identical geometry.
+I didn't have a fix for that yet. I barely had the shape of the problem. What I had, at the end of
+that first real attempt at Ragefire Chasm, was the same wall I'd hit before — coordination worked,
+grouping worked, GM commands worked, and none of it mattered once the bots tried to actually move
+through the dungeon like the game expected them to. The StateManager had solved exactly the problem
+it was built to solve. It just turned out that problem was not the one standing between me and a
+working raid.
 
-The stock server-side mesh generator hard-codes continent values of:
-
-```
-agentRadius = 0.2
-agentHeight = 1.5
-```
-
-Those are reasonable for server-controlled creatures, which do not really obey collision — a server
-NPC can be told where it is and simply be there. My bots were driving a real client, which does obey
-collision. A Tauren male is not 0.2 yards wide:
-
-```
-Tauren Male capsule radius : 0.9747
-Padding                    : 0.05
-Required agent radius      : 1.0247
-Tauren Male capsule height : 2.625
-
-Continent Recast cell size : 0.2666666
-Continent cell height      : 0.25
-
-walkableRadius = ceil(1.0247 / 0.2666666) = 4   (stock bake: 1)
-walkableHeight = ceil(2.625  / 0.25)      = 11  (stock bake: 6)
-```
-
-So the mesh was telling my bots they could stand in gaps five times narrower than their bodies, and
-walk under ceilings they did not fit through. They pathed confidently into geometry that physically
-rejected them, and then sat there — because from the mesh's point of view they were already where
-they wanted to be.
-
-Worse, raising `walkableRadius` in the config alone does not fix it. The generated tile header
-records the agent dimensions it was built with, and the runtime honors the header. You have to patch
-the generator so `agentRadius` and `agentHeight` feed *both* the Recast erosion pass *and* the
-Detour tile parameters. Otherwise you get a mesh that was eroded correctly and is then described to
-the pathfinder as something else.
-
-## The lesson I did not learn yet
-
-There is a rule buried in this that took much longer to surface: **repairing a bad bake at runtime
-is an anti-pattern.** If a route only works because the pathfinding service patched the returned
-path after the query, the underlying data is still wrong and you have converted a reproducible bug
-into an unreproducible one. Fix the generator, the source geometry, or the off-mesh connections.
-
-I did not know any of that in 2024. What I knew was that the coordination problem was solved and the
-thing underneath it was not, and that the thing underneath it was not a coordination problem at all.
-It was geometry, and behind the geometry was physics, and I had not started on physics.
-
-{% include series-nav.html %}

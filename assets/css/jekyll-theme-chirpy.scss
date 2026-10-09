@@ -366,62 +366,162 @@
   opacity: 1;
 }
 
-/* ---------- Series navigation ---------- */
+/* ---------- Persistent chapter table of contents (panel widget) ----------
+   Lives in the sidebar panel on every page, in the slot the theme's default
+   "recently updated" / "trending tags" widgets used to occupy. */
 
-.series-nav {
-  margin: 2.5rem 0 0;
-  padding: 1rem 1.25rem 1.1rem;
-  background: var(--card-bg);
-  border: 1px solid var(--btn-border-color);
-  border-radius: 4px;
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 25%);
+.chapter-toc__list {
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
-.series-nav__title {
+.chapter-toc__item {
+  margin: 0.15rem 0;
+}
+
+.chapter-toc__item a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.chapter-toc__item a:hover .chapter-toc__label {
+  text-decoration: underline;
+  text-decoration-color: var(--blockquote-border-color);
+}
+
+.chapter-toc__number {
+  display: inline-block;
+  min-width: 1.4em;
+  font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  font-weight: 700;
+  color: var(--link-color);
+}
+
+.chapter-toc__label {
+  font-size: 0.88rem;
+}
+
+.chapter-toc__item--current {
+  font-weight: 700;
+  color: var(--heading-color);
+}
+
+.chapter-toc__item--current .chapter-toc__number {
+  color: var(--heading-color);
+}
+
+.chapter-toc__item--current .chapter-toc__label {
+  border-bottom: 1px dotted var(--blockquote-border-color);
+}
+
+/* ---------- Per-chapter heading (BloogBot-style "Chapter N") ----------
+   Rendered by _layouts/post.html, above the article <h1>. Deliberately NOT
+   part of the Markdown body, so it never leaks into excerpts/descriptions. */
+
+.chapter-heading {
+  margin: 0 0 0.35rem;
+  font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  font-size: 1.05rem;
+  font-variant: small-caps;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--link-color);
+}
+
+.chapter-heading::before,
+.chapter-heading::after {
+  content: '\2726';
+  margin: 0 0.55rem;
+  font-size: 0.7rem;
+  vertical-align: middle;
+  color: var(--blockquote-border-color);
+}
+
+/* De-emphasize the posted/updated date line — this is a chapter series,
+   not a dated blog feed, so the date is trivia, not the headline. */
+.chapter-post-meta {
+  font-size: 0.78rem;
+  opacity: 0.72;
+}
+
+/* ---------- Home page: chapter index (replaces the dated post feed) ---------- */
+
+.chapter-index__header {
+  margin: 0.5rem 0 2rem;
+  text-align: center;
+}
+
+.chapter-index__kicker {
+  margin: 0 0 0.35rem;
+  font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  font-variant: small-caps;
+  letter-spacing: 0.15em;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--link-color);
+}
+
+.chapter-index__title {
+  margin: 0 0 0.5rem;
+  font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  color: var(--heading-color);
+}
+
+.chapter-index__tagline {
   margin: 0;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+.chapter-index__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.chapter-index__item {
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--main-border-color);
+}
+
+.chapter-index__item:first-child {
+  border-top: 1px solid var(--main-border-color);
+}
+
+.chapter-index__link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem;
+  text-decoration: none;
+}
+
+.chapter-index__number {
+  flex-shrink: 0;
   font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
   font-variant: small-caps;
   letter-spacing: 0.06em;
-  font-size: 1.05rem;
-  color: var(--heading-color);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--link-color);
 }
 
-.series-nav__lede {
-  margin: 0.15rem 0 0.75rem;
-  font-size: 0.86rem;
-  color: var(--text-muted-color);
-}
-
-.series-nav__list {
-  margin: 0;
-  padding-left: 1.35rem;
-}
-
-.series-nav__item {
-  margin: 0.28rem 0;
-  line-height: 1.4;
-}
-
-.series-nav__item--current .series-nav__label {
+.chapter-index__title-text {
+  font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--heading-color);
 }
 
-.series-nav__here {
-  margin-left: 0.45rem;
-  padding: 0.05rem 0.4rem;
-  font-size: 0.72rem;
-  font-variant: small-caps;
-  letter-spacing: 0.05em;
-  color: #f6e8c8;
-  background: linear-gradient(180deg, #a32a1f 0%, #7d160f 100%);
-  border: 1px solid var(--btn-border-color);
-  border-radius: 3px;
-  white-space: nowrap;
+.chapter-index__link:hover .chapter-index__title-text {
+  text-decoration: underline;
+  text-decoration-color: var(--blockquote-border-color);
 }
 
-.series-nav__list::marker,
-.series-nav__item::marker {
-  color: var(--blockquote-border-color);
-  font-weight: 700;
+.chapter-index__desc {
+  margin: 0.3rem 0 0;
+  font-size: 0.9rem;
+  opacity: 0.82;
 }

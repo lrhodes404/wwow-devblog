@@ -1,0 +1,28 @@
+<!-- The persistent chapter table of contents, shown in the panel on every page,
+     in the slot the theme's default tags/recently-updated widgets used to sit. -->
+
+{% assign chapters = site.posts | where: "series", "buildlog" | sort: "chapter" %}
+
+{% if chapters.size > 1 %}
+  <section id="chapter-toc">
+    <h2 class="panel-heading">Table of Contents</h2>
+    <ol class="chapter-toc__list list-unstyled ps-0 mt-2 mb-1">
+      {% for chapter in chapters %}
+        {% if chapter.url == page.url %}
+          <li class="chapter-toc__item chapter-toc__item--current lh-lg" aria-current="true">
+            <span class="chapter-toc__number">{{ chapter.chapter }}.</span>
+            <span class="chapter-toc__label">{{ chapter.title }}</span>
+          </li>
+        {% else %}
+          <li class="chapter-toc__item lh-lg">
+            <a href="{{ chapter.url | relative_url }}">
+              <span class="chapter-toc__number">{{ chapter.chapter }}.</span>
+              <span class="chapter-toc__label">{{ chapter.title }}</span>
+            </a>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ol>
+  </section>
+  <!-- #chapter-toc -->
+{% endif %}
